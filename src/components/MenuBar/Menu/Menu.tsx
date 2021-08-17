@@ -69,6 +69,7 @@ export default function Menu(props: { buttonClassName?: string }) {
           vertical: isMobile ? -55 : 'bottom',
           horizontal: 'center',
         }}
+        style={{ zIndex: 9999 }}
       >
         {roomType !== 'peer-to-peer' && roomType !== 'go' && (
           <MenuItem

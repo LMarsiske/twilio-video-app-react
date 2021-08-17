@@ -8,6 +8,8 @@ import Tooltip from '@material-ui/core/Tooltip';
 import useScreenShareParticipant from '../../../hooks/useScreenShareParticipant/useScreenShareParticipant';
 import useVideoContext from '../../../hooks/useVideoContext/useVideoContext';
 
+import useOverlayContext from '../../../hooks/useOverlayContext/useOverlayContext';
+
 export const SCREEN_SHARE_TEXT = 'Share Screen';
 export const STOP_SCREEN_SHARE_TEXT = 'Stop Sharing Screen';
 export const SHARE_IN_PROGRESS_TEXT = 'Cannot share screen when another user is sharing';
@@ -33,6 +35,7 @@ export default function ToggleScreenShareButton(props: { disabled?: boolean }) {
   const disableScreenShareButton = Boolean(screenShareParticipant);
   const isScreenShareSupported = navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia;
   const isDisabled = props.disabled || disableScreenShareButton || !isScreenShareSupported;
+  const { toggleVideoOverlay } = useOverlayContext();
 
   let tooltipMessage = '';
 
@@ -56,12 +59,12 @@ export default function ToggleScreenShareButton(props: { disabled?: boolean }) {
           a tooltip when screen sharing is disabled */}
         <Button
           className={classes.button}
-          onClick={toggleScreenShare}
+          onClick={toggleVideoOverlay}
           disabled={isDisabled}
           startIcon={<ScreenShareIcon />}
           data-cy-share-screen
         >
-          {SCREEN_SHARE_TEXT}
+          Toggle Overlay
         </Button>
       </span>
     </Tooltip>

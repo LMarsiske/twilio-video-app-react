@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import clsx from 'clsx';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import { LocalAudioTrack, LocalVideoTrack, Participant, RemoteAudioTrack, RemoteVideoTrack } from 'twilio-video';
@@ -16,6 +16,11 @@ import usePublications from '../../hooks/usePublications/usePublications';
 import useScreenShareParticipant from '../../hooks/useScreenShareParticipant/useScreenShareParticipant';
 import useTrack from '../../hooks/useTrack/useTrack';
 import useVideoContext from '../../hooks/useVideoContext/useVideoContext';
+
+import useOverlayContext from '../../hooks/useOverlayContext/useOverlayContext';
+
+import VideoOverlay from '../VideoOverlay';
+import useWindowSize from '../../hooks/useWindowSize/useWindowSize';
 
 const useStyles = makeStyles((theme: Theme) => ({
   container: {
@@ -116,8 +121,10 @@ interface MainParticipantInfoProps {
 }
 
 export default function MainParticipantInfo({ participant, children }: MainParticipantInfoProps) {
+  const [size, setSize] = useState({ x: 0, y: 0 });
   const classes = useStyles();
   const { room } = useVideoContext();
+  const { isOverlayEnabled } = useOverlayContext();
   const localParticipant = room!.localParticipant;
   const isLocal = localParticipant === participant;
 
@@ -139,14 +146,28 @@ export default function MainParticipantInfo({ participant, children }: MainParti
 
   const isRecording = useIsRecording();
 
+  const divRef = useRef<HTMLDivElement>(null);
+  const windowSize = useWindowSize();
+
+  useEffect(() => {
+    if (divRef.current) {
+      const div = divRef.current;
+      const rect = div ? div.getBoundingClientRect() : null;
+      setSize({ x: rect?.width || 0, y: rect?.height || 0 });
+    }
+  }, [windowSize]);
+
   return (
     <div
+      ref={divRef}
+      id="mainparticipantinfo"
       data-cy-main-participant
       data-cy-participant={participant.identity}
       className={clsx(classes.container, {
         [classes.fullWidth]: !isRemoteParticipantScreenSharing,
       })}
     >
+      {isOverlayEnabled ? <VideoOverlay size={size} /> : null}
       <div className={classes.infoContainer}>
         <div style={{ display: 'flex' }}>
           <div className={classes.identity}>

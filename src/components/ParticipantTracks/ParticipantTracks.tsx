@@ -27,6 +27,7 @@ export default function ParticipantTracks({
   isLocalParticipant,
 }: ParticipantTracksProps) {
   const publications = usePublications(participant);
+  console.log(publications);
 
   let filteredPublications;
 
