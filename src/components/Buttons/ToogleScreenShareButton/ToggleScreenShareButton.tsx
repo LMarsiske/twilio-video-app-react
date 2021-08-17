@@ -35,7 +35,7 @@ export default function ToggleScreenShareButton(props: { disabled?: boolean }) {
   const disableScreenShareButton = Boolean(screenShareParticipant);
   const isScreenShareSupported = navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia;
   const isDisabled = props.disabled || disableScreenShareButton || !isScreenShareSupported;
-  const { toggleVideoOverlay } = useOverlayContext();
+  const { toggleOverlayDrawable } = useOverlayContext();
 
   let tooltipMessage = '';
 
@@ -59,7 +59,7 @@ export default function ToggleScreenShareButton(props: { disabled?: boolean }) {
           a tooltip when screen sharing is disabled */}
         <Button
           className={classes.button}
-          onClick={toggleVideoOverlay}
+          onClick={toggleOverlayDrawable}
           disabled={isDisabled}
           startIcon={<ScreenShareIcon />}
           data-cy-share-screen

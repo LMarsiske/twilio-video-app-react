@@ -1,9 +1,11 @@
-import React, { useState, useRef, useEffect, cloneElement } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Stage, Layer, Line, Group, Shape, Transformer, Rect } from 'react-konva';
 import { SketchPicker } from 'react-color';
 import useDynamicRefs from 'use-dynamic-refs';
 import { makeStyles, withStyles, Paper, Button, Slider, FormControl, FormLabel } from '@material-ui/core';
 import Konva from 'konva';
+
+import useOverlayContext from '../../hooks/useOverlayContext/useOverlayContext';
 
 const useStyles = makeStyles(theme => ({
   fieldset: {
@@ -44,6 +46,7 @@ const ContainedButton = withStyles(theme => ({
 
 const VideoOverlay = props => {
   const classes = useStyles();
+  const { isOverlayDrawable } = useOverlayContext();
   const [tool, setTool] = React.useState('pen');
   const [lines, setLines] = React.useState([]);
   const [draggable, setDraggable] = useState(true);
@@ -68,19 +71,19 @@ const VideoOverlay = props => {
   const [getRef, setRef] = useDynamicRefs();
 
   useEffect(() => {
-    if (draggable) {
+    if (!isOverlayDrawable) {
       let currents = lineRefs.current.map(el => el.current);
       const nodes = [gridRef.current, squareRef.current, ...currents];
       console.log(nodes);
       trRef.current.nodes(nodes);
       trRef.current.getLayer().batchDraw();
     }
-  }, [draggable]);
+  }, [isOverlayDrawable]);
 
-  const switchMode = () => {
-    setDraggable(!draggable);
-    setDrawable(!drawable);
-  };
+  // const switchMode = () => {
+  //   setDraggable(!draggable);
+  //   setDrawable(!drawable);
+  // };
 
   const undoLine = () => {
     let [...copy] = lines;
@@ -104,7 +107,7 @@ const VideoOverlay = props => {
       y: groupRef.current.absolutePosition().y,
     };
     console.log(bound);
-    if (drawable) {
+    if (isOverlayDrawable) {
       isDrawing.current = true;
       setLines([...lines, { tool, points: [pos.x, pos.y] }]);
     }
@@ -113,7 +116,7 @@ const VideoOverlay = props => {
 
   const handleMouseMove = e => {
     // no drawing - skipping
-    if (!isDrawing.current || !drawable) {
+    if (!isDrawing.current || !isOverlayDrawable) {
       return;
     }
     // const bound = {
@@ -282,7 +285,7 @@ const VideoOverlay = props => {
         onMouseup={handleMouseUp}
       >
         <Layer ref={layerRef}>
-          <Group draggable={draggable} ref={groupRef} width={500} height={500} x={10} y={10} onDragEnd={null}>
+          <Group draggable={!isOverlayDrawable} ref={groupRef} width={500} height={500} x={10} y={10} onDragEnd={null}>
             <Shape
               width={500}
               height={500}
@@ -361,7 +364,7 @@ const VideoOverlay = props => {
             }
             return (
               <Line
-                draggable={draggable}
+                draggable={!isOverlayDrawable}
                 ref={ref}
                 key={i}
                 points={line.points}
@@ -373,7 +376,7 @@ const VideoOverlay = props => {
               />
             );
           })}
-          {draggable && (
+          {!isOverlayDrawable && (
             <Transformer
               ref={trRef}
               boundBoxFunc={(oldBox, newBox) => {
