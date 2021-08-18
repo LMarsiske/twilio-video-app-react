@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Stage, Layer, Line, Group, Shape, Transformer, Rect } from 'react-konva';
 import { SketchPicker } from 'react-color';
 import useDynamicRefs from 'use-dynamic-refs';
@@ -46,6 +46,7 @@ const ContainedButton = withStyles(theme => ({
 
 const VideoOverlay = props => {
   const classes = useStyles();
+  const { updateOverlayElements } = useOverlayContext();
   const { isOverlayDrawable } = useOverlayContext();
   const [tool, setTool] = React.useState('pen');
   const [lines, setLines] = React.useState([]);
@@ -80,10 +81,9 @@ const VideoOverlay = props => {
     }
   }, [isOverlayDrawable]);
 
-  // const switchMode = () => {
-  //   setDraggable(!draggable);
-  //   setDrawable(!drawable);
-  // };
+  useEffect(() => {
+    updateOverlayElements({ grid: gridRef.current, lines: lines });
+  }, [lines]);
 
   const undoLine = () => {
     let [...copy] = lines;
@@ -106,7 +106,7 @@ const VideoOverlay = props => {
       x: groupRef.current.absolutePosition().x,
       y: groupRef.current.absolutePosition().y,
     };
-    console.log(bound);
+    //console.log(bound);
     if (isOverlayDrawable) {
       isDrawing.current = true;
       setLines([...lines, { tool, points: [pos.x, pos.y] }]);
@@ -119,19 +119,8 @@ const VideoOverlay = props => {
     if (!isDrawing.current || !isOverlayDrawable) {
       return;
     }
-    // const bound = {
-    //   ...gridRef.current.getAttrs(),
-    //   x: gridRef.current.absolutePosition().x,
-    //   y: gridRef.current.absolutePosition().y,
-    // };
     const stage = e.target.getStage();
     const point = stage.getPointerPosition();
-    // if (
-    //   point.x >= bound.x &&
-    //   point.x <= bound.x + bound.width &&
-    //   point.y >= bound.y &&
-    //   point.y <= bound.y + bound.height
-    // ) {
     let lastLine = lines[lines.length - 1];
     // add point
     lastLine.points = lastLine.points.concat([point.x - offset.current.x, point.y - offset.current.y]);
@@ -139,107 +128,10 @@ const VideoOverlay = props => {
     // replace last
     lines.splice(lines.length - 1, 1, lastLine);
     setLines(lines.concat());
-    // } else {
-    //   return;
-    // }
   };
 
   const handleMouseUp = () => {
     isDrawing.current = false;
-  };
-
-  const saveImage = () => {
-    let grid = gridRef.current;
-    console.log(grid.attrs);
-    let square = squareRef.current;
-    let currents = lineRefs.current.map(el => el.current);
-
-    let group = new Konva.Group({ x: 0, y: 0 });
-
-    group.add(
-      new Konva.Shape({
-        x: 0,
-        y: 0,
-        width: 500,
-        height: 500,
-        fill: '#000000',
-        stroke: '#000000',
-        sceneFunc: function(ctx, shape) {
-          let x = 0,
-            y = 0;
-
-          ctx.beginPath();
-          for (x; x <= 500; x += 50) {
-            ctx.moveTo(x, 0);
-            ctx.lineTo(x, 500);
-          }
-          for (y; y <= 500; y += 50) {
-            ctx.moveTo(0, y);
-            ctx.lineTo(500, y);
-          }
-
-          ctx.font = `bold 16px Arial`;
-          ctx.textAlign = 'center';
-          let i = 1;
-          for (let y = 0; y < 10; y++) {
-            for (let x = 0; x < 10; x++) {
-              ctx.fillText(`${i}`, x * 50 + 25, y * 50 + 30);
-              i++;
-            }
-          }
-
-          ctx.closePath();
-          ctx.fillStrokeShape(shape);
-        },
-      })
-    );
-    group.add(
-      new Konva.Rect({
-        x: 0,
-        y: 0,
-        width: 500,
-        height: 500,
-        stroke: '#000000',
-        strokeWidth: 10,
-      })
-    );
-
-    let pos = grid.absolutePosition();
-    if (grid.attrs.rotation && grid.attrs.rotation !== 0) {
-      let xy = translateAndRotatePoints(
-        [grid.absolutePosition().x, grid.absolutePosition().y],
-        { scaleX: grid.attrs.scaleX || 1, scaleY: grid.attrs.scaleY || 1 },
-        0 - grid.attrs.rotation
-      );
-      pos = { x: xy[0], y: xy[1] };
-    }
-    let offset = {
-      ...pos,
-      rotation: grid.attrs.rotation || 0,
-      scaleX: grid.attrs.scaleX || 1,
-      scaleY: grid.attrs.scaleY || 1,
-    };
-    currents.forEach(node => {
-      let points = translateAndRotatePoints([...node.attrs.points], offset, 0 - offset.rotation);
-      let scale = 1 / offset.scaleX;
-      group.add(
-        new Konva.Line({
-          points: points,
-          stroke: '#0e1ef6',
-          strokeWidth: scale < 1 ? 1 : 3,
-          tension: 0.5,
-          lineCap: 'round',
-          scaleX: 1 / offset.scaleX,
-          scaleY: 1 / offset.scaleY,
-        })
-      );
-    });
-    let url = group.toDataURL({ pixelRatio: 2 });
-    let hiddenElement = document.createElement('a');
-    hiddenElement.href = url;
-    hiddenElement.target = '_blank';
-    hiddenElement.download = 'stage.png';
-    hiddenElement.click();
   };
 
   const translateAndRotatePoints = (points, offset, angle) => {
@@ -273,7 +165,15 @@ const VideoOverlay = props => {
 
   return (
     <div
-      style={{ position: 'absolute', top: 0, left: 0, display: 'flex', height: '100%', width: '100%', zIndex: 500 }}
+      style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        display: 'flex',
+        height: '100%',
+        width: '100%',
+        zIndex: 500,
+      }}
       id="container"
     >
       <Stage
@@ -331,29 +231,6 @@ const VideoOverlay = props => {
               }}
             />
             <Rect ref={squareRef} width={500} height={500} strokeWidth={10} stroke={gridColor} />
-            {/* {lines.map((line, i) => {
-              let ref = setRef(line);
-              if (i === 0) {
-                lineRefs.current = [ref];
-              } else {
-                lineRefs.current = [...lineRefs.current, ref];
-              }
-              return (
-                <Line
-                  draggable={draggable}
-                  ref={ref}
-                  key={i}
-                  points={line.points}
-                  stroke={strokeColor}
-                  strokeWidth={3}
-                  tension={0.5}
-                  lineCap="round"
-                  globalCompositeOperation={
-                    line.tool === "eraser" ? "destination-out" : "source-over"
-                  }
-                />
-              );
-            })} */}
           </Group>
           {lines.map((line, i) => {
             let ref = setRef(line);

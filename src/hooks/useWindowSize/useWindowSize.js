@@ -7,10 +7,11 @@ function useWindowSize() {
   });
   useLayoutEffect(() => {
     function updateSize() {
-      setSize({
+      let newSize = {
         x: window.innerWidth * (window.visualViewport?.scale || 1),
         y: window.innerHeight * (window.visualViewport?.scale || 1),
-      });
+      };
+      setSize(newSize);
     }
     window.addEventListener('resize', updateSize);
     updateSize();

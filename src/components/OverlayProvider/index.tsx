@@ -1,7 +1,9 @@
 import React, { createContext, ReactNode } from 'react';
+import Konva from 'konva';
 
 import useToggleVideoOverlay from '../../hooks/useVideoOverlay/useToggleVideoOverlay';
 import useToggleOverlayDrawing from '../../hooks/useVideoOverlay/useToggleOverlayDrawing';
+import useSaveOverlayImage from '../../hooks/useVideoOverlay/useSaveOverlayImage';
 
 /*
  *  The hooks used by the VideoProvider component are different than the hooks found in the 'hooks/' directory. The hooks
@@ -15,6 +17,10 @@ export interface IOverlayContext {
   toggleVideoOverlay: () => void;
   isOverlayDrawable: boolean;
   toggleOverlayDrawable: () => void;
+  overlayElements: { grid: Konva.Shape | null; lines: { tool: string; points: number[] }[] | null } | null;
+  updateOverlayElements: (elements: { grid: Konva.Shape; lines: { tool: string; points: number[] }[] }) => void;
+  isSavingAllowed: boolean;
+  saveImage: () => void;
 }
 
 export const OverlayContext = createContext<IOverlayContext>(null!);
@@ -26,7 +32,7 @@ interface OverlayProviderProps {
 export function OverlayProvider({ children }: OverlayProviderProps) {
   const [isOverlayEnabled, toggleVideoOverlay] = useToggleVideoOverlay();
   const [isOverlayDrawable, toggleOverlayDrawable] = useToggleOverlayDrawing();
-
+  const [overlayElements, updateOverlayElements, isSavingAllowed, saveImage] = useSaveOverlayImage();
   return (
     <OverlayContext.Provider
       value={{
@@ -34,6 +40,10 @@ export function OverlayProvider({ children }: OverlayProviderProps) {
         toggleVideoOverlay,
         isOverlayDrawable,
         toggleOverlayDrawable,
+        overlayElements,
+        updateOverlayElements,
+        isSavingAllowed,
+        saveImage,
       }}
     >
       {children}
