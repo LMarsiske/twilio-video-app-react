@@ -7,5 +7,10 @@ export default function useToggleVideoOverlay() {
     setIsOverlayEnabled(!isOverlayEnabled);
   }, [isOverlayEnabled]);
 
-  return [isOverlayEnabled, toggleVideoOverlay] as const;
+  const resetVideoOverlay = () => {
+    setIsOverlayEnabled(false);
+    setTimeout(() => setIsOverlayEnabled(true), 250);
+  };
+
+  return [isOverlayEnabled, toggleVideoOverlay, resetVideoOverlay] as const;
 }

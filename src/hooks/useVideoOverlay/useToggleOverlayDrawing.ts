@@ -7,5 +7,5 @@ export default function useToggleOverlayDrawing() {
     setIsOverlayDrawable(!isOverlayDrawable);
   }, [isOverlayDrawable]);
 
-  return [isOverlayDrawable, toggleOverlayDrawable] as const;
+  return [isOverlayDrawable, toggleOverlayDrawable, setIsOverlayDrawable] as const;
 }

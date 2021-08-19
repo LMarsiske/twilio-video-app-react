@@ -16,6 +16,8 @@ import ToggleChatButton from '../Buttons/ToggleChatButton/ToggleChatButton';
 import ToggleVideoButton from '../Buttons/ToggleVideoButton/ToggleVideoButton';
 import ToggleScreenShareButton from '../Buttons/ToogleScreenShareButton/ToggleScreenShareButton';
 import ToggleOverlayModeButton from '../Buttons/ToggleOverlayModeButton/ToggleOverlayModeButton';
+import SaveOverlayButton from '../Buttons/SaveOverlayButton/SaveOverlayButton';
+import ResetOverlayButton from '../Buttons/ResetOverlayButton/ResetOverlayButton';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -69,7 +71,7 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function MenuBar() {
   const classes = useStyles();
   const { isSharingScreen, toggleScreenShare } = useVideoContext();
-  const { isSavingAllowed, saveImage } = useOverlayContext();
+  const { isSavingAllowed, isResetAllowed, saveImage, resetVideoOverlay } = useOverlayContext();
   const roomState = useRoomState();
   const isReconnecting = roomState === 'reconnecting';
   const { room } = useVideoContext();
@@ -86,19 +88,16 @@ export default function MenuBar() {
         <Grid container justifyContent="space-around" alignItems="center">
           <Hidden smDown>
             <Grid style={{ flex: 1 }}>
-              <Typography variant="body1">{room!.name}</Typography>
+              <ToggleAudioButton disabled={isReconnecting} />
+              <ToggleVideoButton disabled={isReconnecting} />
             </Grid>
           </Hidden>
           <Grid item>
             <Grid container justifyContent="center">
-              <ToggleAudioButton disabled={isReconnecting} />
-              <ToggleVideoButton disabled={isReconnecting} />
-              <ToggleOverlayModeButton />
-              <Fade in={isSavingAllowed}>
-                <Button onClick={saveImage}>Save</Button>
-              </Fade>
-              {process.env.REACT_APP_DISABLE_TWILIO_CONVERSATIONS !== 'true' && <ToggleChatButton />}
               <Menu />
+              <ToggleOverlayModeButton />
+              <SaveOverlayButton />
+              <ResetOverlayButton />
             </Grid>
           </Grid>
           <Hidden smDown>

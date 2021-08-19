@@ -8,12 +8,14 @@ export default function useSaveOverlayImage() {
   }>({ grid: null, lines: null });
 
   const [isSavingAllowed, setIsSavingAllowed] = useState(false);
+  const [isResetAllowed, setIsResetAllowed] = useState(true);
 
   const updateOverlayElements = useCallback(
     (elements: { grid: Konva.Shape; lines: { tool: string; points: number[] }[] }) => {
       console.log('New Elements: ', elements);
       setOverlayElements(elements);
       setIsSavingAllowed(elements.lines.length > 0 ? true : false);
+      setIsResetAllowed(elements.lines.length > 0 ? false : true);
     },
     [overlayElements]
   );
@@ -120,6 +122,7 @@ export default function useSaveOverlayImage() {
     hiddenElement.target = '_blank';
     hiddenElement.download = 'stage.png';
     hiddenElement.click();
+    setIsResetAllowed(true);
   };
 
   const translateAndRotatePoints = (
@@ -155,5 +158,12 @@ export default function useSaveOverlayImage() {
     return translated.flat();
   };
 
-  return [overlayElements, updateOverlayElements, isSavingAllowed, saveImage] as const;
+  return [
+    overlayElements,
+    updateOverlayElements,
+    isSavingAllowed,
+    saveImage,
+    isResetAllowed,
+    setIsResetAllowed,
+  ] as const;
 }

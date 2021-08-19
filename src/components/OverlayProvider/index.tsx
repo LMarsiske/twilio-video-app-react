@@ -15,12 +15,14 @@ import useSaveOverlayImage from '../../hooks/useVideoOverlay/useSaveOverlayImage
 export interface IOverlayContext {
   isOverlayEnabled: boolean;
   toggleVideoOverlay: () => void;
+  resetVideoOverlay: () => void;
   isOverlayDrawable: boolean;
   toggleOverlayDrawable: () => void;
   overlayElements: { grid: Konva.Shape | null; lines: { tool: string; points: number[] }[] | null } | null;
   updateOverlayElements: (elements: { grid: Konva.Shape; lines: { tool: string; points: number[] }[] }) => void;
   isSavingAllowed: boolean;
   saveImage: () => void;
+  isResetAllowed: boolean;
 }
 
 export const OverlayContext = createContext<IOverlayContext>(null!);
@@ -30,20 +32,33 @@ interface OverlayProviderProps {
 }
 
 export function OverlayProvider({ children }: OverlayProviderProps) {
-  const [isOverlayEnabled, toggleVideoOverlay] = useToggleVideoOverlay();
-  const [isOverlayDrawable, toggleOverlayDrawable] = useToggleOverlayDrawing();
-  const [overlayElements, updateOverlayElements, isSavingAllowed, saveImage] = useSaveOverlayImage();
+  const [isOverlayEnabled, toggleVideoOverlay, resetVideoOverlay] = useToggleVideoOverlay();
+  const [isOverlayDrawable, toggleOverlayDrawable, setIsOverlayDrawable] = useToggleOverlayDrawing();
+  const [
+    overlayElements,
+    updateOverlayElements,
+    isSavingAllowed,
+    saveImage,
+    isResetAllowed,
+    setIsResetAllowed,
+  ] = useSaveOverlayImage();
   return (
     <OverlayContext.Provider
       value={{
         isOverlayEnabled,
         toggleVideoOverlay,
+        resetVideoOverlay: () => {
+          resetVideoOverlay();
+          setIsOverlayDrawable(false);
+          setIsResetAllowed(false);
+        },
         isOverlayDrawable,
         toggleOverlayDrawable,
         overlayElements,
         updateOverlayElements,
         isSavingAllowed,
         saveImage,
+        isResetAllowed,
       }}
     >
       {children}
