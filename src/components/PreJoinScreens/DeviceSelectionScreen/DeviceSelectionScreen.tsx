@@ -66,7 +66,9 @@ export default function DeviceSelectionScreen({ name, roomName, setStep }: Devic
   const disableButtons = isFetching || isAcquiringLocalTracks || isConnecting;
 
   const handleJoin = () => {
+    console.log('JOINING: ', name, roomName);
     getToken(name, roomName).then(({ token }) => {
+      console.log('TOKEN:', token);
       videoConnect(token);
       process.env.REACT_APP_DISABLE_TWILIO_CONVERSATIONS !== 'true' && chatConnect(token);
     });
