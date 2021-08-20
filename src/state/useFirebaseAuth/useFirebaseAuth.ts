@@ -77,7 +77,7 @@ export default function useFirebaseAuth() {
     });
   }, []);
 
-  const signIn = useCallback(() => {
+  const signInWithGoogle = useCallback(() => {
     const provider = new firebase.auth.GoogleAuthProvider();
     provider.addScope('https://www.googleapis.com/auth/plus.login');
 
@@ -86,6 +86,24 @@ export default function useFirebaseAuth() {
       .signInWithPopup(provider)
       .then(newUser => {
         setUser(newUser.user);
+      });
+  }, []);
+
+  const firebaseSignIn = useCallback((email: string, password: string) => {
+    // const provider = new firebase.auth.EmailAuthProvider();
+    // provider.
+
+    console.log('Trying to sign in...');
+
+    // const email:string = "zrdeland@gmail.com";
+    // const pwd:string = "testtest";
+
+    return firebase
+      .auth()
+      .signInWithEmailAndPassword(email, password)
+      .then(newUser => {
+        setUser(newUser.user);
+        console.log('User authenticated.');
       });
   }, []);
 
@@ -98,5 +116,5 @@ export default function useFirebaseAuth() {
       });
   }, []);
 
-  return { user, signIn, signOut, isAuthReady, getToken, updateRecordingRules };
+  return { user, firebaseSignIn, signOut, isAuthReady, getToken, updateRecordingRules };
 }
