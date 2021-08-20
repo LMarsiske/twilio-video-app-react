@@ -90,7 +90,7 @@
     "cypress:open": "cypress open",
     "cypress:run": "cypress run --browser chrome",
     "cypress:ci": "cross-env CYPRESS_baseUrl=http://localhost:8081 start-server-and-test server http://localhost:8081 cypress:run",
-    "deploy:twilio-cli": "cross-env REACT_APP_SET_AUTH=passcode npm run build && twilio rtc:apps:video:deploy --authentication=passcode --app-directory ./build"
+    "deploy-dev": "react-scripts build && firebase deploy --only hosting:twilio-video-demo-app "
   },
   "eslintConfig": {
     "extends": "react-app",
