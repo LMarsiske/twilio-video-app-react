@@ -51,19 +51,40 @@ const useStyles = makeStyles((theme: Theme) => ({
       width: '100%',
     },
   },
+  inputContainer: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    margin: '1.5em 0 3.5em',
+    '& div:not(:last-child)': {
+      marginRight: '1em',
+    },
+    [theme.breakpoints.down('sm')]: {
+      margin: '1.5em 0 2em',
+    },
+  },
+  textFieldContainer: {
+    width: '100%',
+  },
+  continueButton: {
+    [theme.breakpoints.down('sm')]: {
+      width: '100%',
+    },
+  },
 }));
 
 export default function LoginPage() {
   const classes = useStyles();
-  const { signIn, user, isAuthReady } = useAppState();
+  const { signIn, firebaseSignIn, user, isAuthReady } = useAppState();
   const history = useHistory();
   const location = useLocation<{ from: Location }>();
   const [passcode, setPasscode] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [authError, setAuthError] = useState<Error | null>(null);
 
   const isAuthEnabled = Boolean(process.env.REACT_APP_SET_AUTH);
 
-  const login = () => {
+  const loginWithPasscode = () => {
     setAuthError(null);
     signIn?.(passcode)
       .then(() => {
@@ -72,9 +93,31 @@ export default function LoginPage() {
       .catch(err => setAuthError(err));
   };
 
+  const loginWithFirebase = () => {
+    setAuthError(null);
+    firebaseSignIn?.(email, password)
+      .then(() => {
+        history.replace(location?.state?.from || { pathname: '/' });
+      })
+      .catch(err => setAuthError(err));
+  };
+
+  const handleEmailChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setEmail(event.target.value);
+  };
+
+  const handlePasswordChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setPassword(event.target.value);
+  };
+
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    login();
+    loginWithFirebase();
+  };
+
+  const handleSubmitWithPasscode = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    loginWithPasscode();
   };
 
   if (user || !isAuthEnabled) {
@@ -88,14 +131,66 @@ export default function LoginPage() {
   return (
     <IntroContainer>
       {process.env.REACT_APP_SET_AUTH === 'firebase' && (
+        // <>
+        //   <Typography variant="h5" className={classes.gutterBottom}>
+        //     Sign in to join a room
+        //   </Typography>
+        //   <Typography variant="body1">Sign in using your Twilio Google Account</Typography>
+        //   <Button variant="contained" className={classes.googleButton} onClick={login} startIcon={<GoogleLogo />}>
+        //     Sign in with Google
+        //   </Button>
+        // </>
         <>
           <Typography variant="h5" className={classes.gutterBottom}>
-            Sign in to join a room
+            Join Teletraining Session
           </Typography>
-          <Typography variant="body1">Sign in using your Twilio Google Account</Typography>
-          <Button variant="contained" className={classes.googleButton} onClick={login} startIcon={<GoogleLogo />}>
-            Sign in with Google
-          </Button>
+          <Typography variant="body1">
+            'Enter your authorized email and the session code provided by the instructor.
+          </Typography>
+          <form onSubmit={handleSubmit}>
+            <div className={classes.inputContainer}>
+              <div className={classes.textFieldContainer}>
+                <InputLabel shrink htmlFor="input-user-name">
+                  Authorized Email
+                </InputLabel>
+                <TextField
+                  id="input-user-name"
+                  variant="outlined"
+                  fullWidth
+                  size="small"
+                  value={email}
+                  onChange={handleEmailChange}
+                />
+                {/* <p>Must enter the same email used to access your MamamCare course.</p> */}
+              </div>
+
+              <div className={classes.textFieldContainer}>
+                <InputLabel shrink htmlFor="input-room-name">
+                  Password
+                </InputLabel>
+                <TextField
+                  autoCapitalize="false"
+                  id="input-password"
+                  variant="outlined"
+                  fullWidth
+                  size="small"
+                  value={password}
+                  onChange={handlePasswordChange}
+                />
+              </div>
+            </div>
+            <Grid container justifyContent="flex-end">
+              <Button
+                variant="contained"
+                type="submit"
+                color="primary"
+                disabled={!email || !password}
+                className={classes.continueButton}
+              >
+                Continue
+              </Button>
+            </Grid>
+          </form>
         </>
       )}
 
@@ -104,7 +199,7 @@ export default function LoginPage() {
           <Typography variant="h5" className={classes.gutterBottom}>
             Enter passcode to join a room
           </Typography>
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmitWithPasscode}>
             <Grid container justifyContent="space-between">
               <div className={classes.passcodeContainer}>
                 <InputLabel shrink htmlFor="input-passcode">

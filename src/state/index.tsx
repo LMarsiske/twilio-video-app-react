@@ -13,6 +13,7 @@ export interface StateContextType {
   getToken(name: string, room: string, passcode?: string): Promise<{ room_type: RoomType; token: string }>;
   user?: User | null | { displayName: undefined; photoURL: undefined; passcode?: string };
   signIn?(passcode?: string): Promise<void>;
+  firebaseSignIn(email: string, password: string): Promise<void>;
   signOut?(): Promise<void>;
   isAuthReady?: boolean;
   isFetching: boolean;
