@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Stage, Layer, Line, Group, Shape, Transformer, Rect } from 'react-konva';
+import React, { useState, useRef, useEffect, useCallback, forwardRef } from 'react';
+import { Stage, Layer, Line, Group, Shape, Transformer, Rect, Text } from 'react-konva';
 import { SketchPicker } from 'react-color';
 import useDynamicRefs from 'use-dynamic-refs';
 import { makeStyles, withStyles, Paper, Button, Slider, FormControl, FormLabel } from '@material-ui/core';
@@ -46,16 +46,18 @@ const ContainedButton = withStyles(theme => ({
 
 const VideoOverlay = props => {
   const classes = useStyles();
-  const { updateOverlayElements } = useOverlayContext();
+  const { updateOverlayElements, markers } = useOverlayContext();
   const { isOverlayDrawable, shouldClearVideoOverlay, toggleShouldClearOverlayState } = useOverlayContext();
   const [tool, setTool] = React.useState('pen');
   const [lines, setLines] = React.useState([]);
+  const [selectedMarkers, setSelectedMarkers] = useState([]);
   const [draggable, setDraggable] = useState(true);
   const [drawable, setDrawable] = useState(false);
   const [gridWidth, setGridWidth] = useState(3);
   const [strokeWidth, setStrokeWidth] = useState(3);
   const [gridColor, setGridColor] = useState('#ffffff');
-  const [strokeColor, setStrokeColor] = useState('green');
+  const [strokeColor, setStrokeColor] = useState('blue');
+  const [markerColor, setMarkerColor] = useState('green');
   const [showGridColorPicker, setShowGridColorPicker] = useState(false);
   const [showStrokeColorPicker, setShowStrokeColorPicker] = useState(false);
   const [selected, setSelected] = useState(false);
@@ -67,7 +69,15 @@ const VideoOverlay = props => {
   const lineRefs = useRef([]);
   const layerRef = useRef(null);
   const stageRef = useRef(null);
-  const trRef = React.useRef();
+  const trRef = useRef();
+  const [showN, setShowN] = useState(false);
+  const nRef = useRef(null);
+  const [showV, setShowV] = useState(false);
+  const vRef = useRef(null);
+  const [showA, setShowA] = useState(false);
+  const aRef = useRef(null);
+  const [showS, setShowS] = useState(false);
+  const sRef = useRef(null);
 
   const [getRef, setRef] = useDynamicRefs();
 
@@ -82,8 +92,31 @@ const VideoOverlay = props => {
   }, [isOverlayDrawable]);
 
   useEffect(() => {
-    updateOverlayElements({ grid: gridRef.current, lines: lines });
-  }, [lines]);
+    updateOverlayElements({ grid: gridRef.current, lines: lines, activeMarkers: selectedMarkers });
+  }, [lines, selectedMarkers]);
+
+  useEffect(() => {
+    markers.forEach(marker => {
+      switch (marker.id) {
+        case 'n':
+          setShowN(marker.active);
+          break;
+        case 'v':
+          setShowV(marker.active);
+          break;
+        case 'a':
+          setShowA(marker.active);
+          break;
+        case 's':
+          setShowS(marker.active);
+          break;
+      }
+    });
+  }, [markers]);
+
+  useEffect(() => {
+    setSelectedMarkers([nRef.current, vRef.current, aRef.current, sRef.current].filter(el => el));
+  }, [showN, showV, showA, showS]);
 
   useEffect(() => {
     if (shouldClearVideoOverlay) {
@@ -140,35 +173,6 @@ const VideoOverlay = props => {
 
   const handleMouseUp = () => {
     isDrawing.current = false;
-  };
-
-  const translateAndRotatePoints = (points, offset, angle) => {
-    let cx = (500 * offset.scaleX) / 2;
-    let cy = (500 * offset.scaleY) / 2;
-    let radians = (Math.PI / 180) * angle;
-    let cos = Math.cos(radians);
-    let sin = Math.sin(radians);
-    console.log(angle);
-
-    let chunked = [];
-    for (let i = 0; i < points.length; i += 2) {
-      chunked.push(points.slice(i, i + 2));
-    }
-    let translated = chunked.map(chunk => {
-      let x = chunk[0];
-      let y = chunk[1];
-
-      let nx = cos * (x - cx) - sin * (y - cy) + cx;
-      let ny = cos * (y - cy) + sin * (x - cx) + cy;
-
-      if (offset.x || offset.y) {
-        return [nx - offset.x, ny - offset.y];
-      } else {
-        return [nx, ny];
-      }
-    });
-
-    return translated.flat();
   };
 
   return (
@@ -273,6 +277,10 @@ const VideoOverlay = props => {
               }}
             />
           )}
+          {showN && <N ref={nRef} x={250} y={250} color={markerColor} draggable={!isOverlayDrawable} />}
+          {showV && <V ref={vRef} x={350} y={350} color={markerColor} draggable={!isOverlayDrawable} />}
+          {showA && <A ref={aRef} x={450} y={450} color={markerColor} draggable={!isOverlayDrawable} />}
+          {showS && <S ref={sRef} x={550} y={550} color={markerColor} draggable={!isOverlayDrawable} />}
         </Layer>
       </Stage>
       {/* <Paper
@@ -349,6 +357,173 @@ const VideoOverlay = props => {
     </div>
   );
 };
+
+const N = forwardRef((props, ref) => {
+  const { x, y, color, draggable } = props;
+  const trRef = useRef(null);
+
+  useEffect(() => {
+    if (draggable) {
+      console.log('N can be dragged');
+      trRef.current.nodes([ref.current]);
+      trRef.current.getLayer().batchDraw();
+    }
+  }, [draggable]);
+  return (
+    <>
+      <Text
+        ref={ref}
+        draggable={draggable}
+        text="N"
+        fontSize={64}
+        fontStyle="bold"
+        x={x}
+        y={y}
+        stroke={color}
+        fill={color}
+        align="center"
+        verticalAlign="middle"
+      />
+      {draggable && (
+        <Transformer
+          ref={trRef}
+          boundBoxFunc={(oldBox, newBox) => {
+            // limit resize
+            if (newBox.width < 10 || newBox.height < 10) {
+              return oldBox;
+            }
+            return newBox;
+          }}
+        />
+      )}
+    </>
+  );
+});
+
+const V = forwardRef((props, ref) => {
+  const { x, y, color, draggable } = props;
+  const trRef = useRef(null);
+
+  useEffect(() => {
+    if (draggable) {
+      console.log('N can be dragged');
+      trRef.current.nodes([ref.current]);
+      trRef.current.getLayer().batchDraw();
+    }
+  }, [draggable]);
+  return (
+    <>
+      <Text
+        ref={ref}
+        draggable={draggable}
+        text="V"
+        fontSize={64}
+        fontStyle="bold"
+        x={x}
+        y={y}
+        stroke={color}
+        fill={color}
+        align="center"
+        verticalAlign="middle"
+      />
+      {draggable && (
+        <Transformer
+          ref={trRef}
+          boundBoxFunc={(oldBox, newBox) => {
+            // limit resize
+            if (newBox.width < 10 || newBox.height < 10) {
+              return oldBox;
+            }
+            return newBox;
+          }}
+        />
+      )}
+    </>
+  );
+});
+const A = forwardRef((props, ref) => {
+  const { x, y, color, draggable } = props;
+  const trRef = useRef(null);
+
+  useEffect(() => {
+    if (draggable) {
+      console.log('N can be dragged');
+      trRef.current.nodes([ref.current]);
+      trRef.current.getLayer().batchDraw();
+    }
+  }, [draggable]);
+  return (
+    <>
+      <Text
+        ref={ref}
+        draggable={draggable}
+        text="A"
+        fontSize={64}
+        fontStyle="bold"
+        x={x}
+        y={y}
+        stroke={color}
+        fill={color}
+        align="center"
+        verticalAlign="middle"
+      />
+      {draggable && (
+        <Transformer
+          ref={trRef}
+          boundBoxFunc={(oldBox, newBox) => {
+            // limit resize
+            if (newBox.width < 10 || newBox.height < 10) {
+              return oldBox;
+            }
+            return newBox;
+          }}
+        />
+      )}
+    </>
+  );
+});
+
+const S = forwardRef((props, ref) => {
+  const { x, y, color, draggable } = props;
+  const trRef = useRef(null);
+
+  useEffect(() => {
+    if (draggable) {
+      console.log('N can be dragged');
+      trRef.current.nodes([ref.current]);
+      trRef.current.getLayer().batchDraw();
+    }
+  }, [draggable]);
+  return (
+    <>
+      <Text
+        ref={ref}
+        draggable={draggable}
+        text="S"
+        fontSize={64}
+        fontStyle="bold"
+        x={x}
+        y={y}
+        stroke={color}
+        fill={color}
+        align="center"
+        verticalAlign="middle"
+      />
+      {draggable && (
+        <Transformer
+          ref={trRef}
+          boundBoxFunc={(oldBox, newBox) => {
+            // limit resize
+            if (newBox.width < 10 || newBox.height < 10) {
+              return oldBox;
+            }
+            return newBox;
+          }}
+        />
+      )}
+    </>
+  );
+});
 
 const CustomPicker = props => {
   const ref = useRef(null);

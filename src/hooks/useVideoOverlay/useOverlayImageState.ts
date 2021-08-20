@@ -2,10 +2,17 @@ import React, { useCallback, useState } from 'react';
 import Konva from 'konva';
 
 export default function useOverlayImageState() {
+  const [markers, setMarkers] = useState<{ id: string; active: boolean }[]>([
+    { id: 'n', active: false },
+    { id: 'v', active: false },
+    { id: 'a', active: false },
+    { id: 's', active: false },
+  ]);
   const [overlayElements, setOverlayElements] = useState<{
     grid: Konva.Shape | null;
     lines: { tool: string; points: number[] }[] | null;
-  }>({ grid: null, lines: null });
+    activeMarkers: Konva.Text[] | null;
+  }>({ grid: null, lines: null, activeMarkers: null });
 
   const [isSavingAllowed, setIsSavingAllowed] = useState(false);
   const [isResetAllowed, setIsResetAllowed] = useState(false);
@@ -20,8 +27,8 @@ export default function useOverlayImageState() {
   };
 
   const updateOverlayElements = useCallback(
-    (elements: { grid: Konva.Shape; lines: { tool: string; points: number[] }[] }) => {
-      //console.log('New Elements: ', elements);
+    (elements: { grid: Konva.Shape; lines: { tool: string; points: number[] }[]; activeMarkers: Konva.Text[] }) => {
+      console.log('New Elements: ', elements);
       setOverlayElements(elements);
       setIsSavingAllowed(elements.lines.length > 0 ? true : false);
     },
@@ -29,7 +36,7 @@ export default function useOverlayImageState() {
   );
 
   const saveImage = () => {
-    const { grid, lines } = overlayElements;
+    const { grid, lines, activeMarkers } = overlayElements;
     console.log(grid?.attrs);
 
     let group = new Konva.Group({ x: 0, y: 0 });
@@ -128,6 +135,26 @@ export default function useOverlayImageState() {
         );
       });
     }
+    if (activeMarkers && activeMarkers.length > 0) {
+      activeMarkers.forEach(marker => {
+        let coords = translateAndRotatePoints(
+          [marker.getAbsolutePosition().x, marker.getAbsolutePosition().y],
+          offset,
+          marker.attrs.rotation
+        );
+        console.log(marker.text(), coords);
+        group.add(
+          new Konva.Text({
+            text: marker.text(),
+            x: coords[0],
+            y: coords[1],
+            fontSize: 32,
+            stroke: 'green',
+            fill: 'green',
+          })
+        );
+      });
+    }
     let url = group.toDataURL({ pixelRatio: 2 });
     let hiddenElement = document.createElement('a');
     hiddenElement.href = url;
@@ -182,5 +209,7 @@ export default function useOverlayImageState() {
     setIsResetAllowed,
     shouldClearVideoOverlay,
     toggleShouldClearOverlayState,
+    markers,
+    setMarkers,
   ] as const;
 }

@@ -4,6 +4,7 @@ import Konva from 'konva';
 import useToggleVideoOverlay from '../../hooks/useVideoOverlay/useToggleVideoOverlay';
 import useToggleOverlayDrawing from '../../hooks/useVideoOverlay/useToggleOverlayDrawing';
 import useOverlayImageState from '../../hooks/useVideoOverlay/useOverlayImageState';
+import firebase from 'firebase';
 
 /*
  *  The hooks used by the VideoProvider component are different than the hooks found in the 'hooks/' directory. The hooks
@@ -19,12 +20,18 @@ export interface IOverlayContext {
   isOverlayDrawable: boolean;
   toggleOverlayDrawable: () => void;
   overlayElements: { grid: Konva.Shape | null; lines: { tool: string; points: number[] }[] | null } | null;
-  updateOverlayElements: (elements: { grid: Konva.Shape; lines: { tool: string; points: number[] }[] }) => void;
+  updateOverlayElements: (elements: {
+    grid: Konva.Shape;
+    lines: { tool: string; points: number[] }[];
+    activeMarkers: Konva.Text[];
+  }) => void;
   isSavingAllowed: boolean;
   saveImage: () => void;
   isResetAllowed: boolean;
   shouldClearVideoOverlay: boolean;
   toggleShouldClearOverlayState: (state: boolean) => void;
+  markers: { id: string; active: boolean }[];
+  setMarkers: (markers: { id: string; active: boolean }[]) => void;
 }
 
 export const OverlayContext = createContext<IOverlayContext>(null!);
@@ -45,6 +52,8 @@ export function OverlayProvider({ children }: OverlayProviderProps) {
     setIsResetAllowed,
     shouldClearVideoOverlay,
     toggleShouldClearOverlayState,
+    markers,
+    setMarkers,
   ] = useOverlayImageState();
   return (
     <OverlayContext.Provider
@@ -65,6 +74,8 @@ export function OverlayProvider({ children }: OverlayProviderProps) {
         isResetAllowed,
         shouldClearVideoOverlay,
         toggleShouldClearOverlayState,
+        markers,
+        setMarkers: markers => setMarkers(markers),
       }}
     >
       {children}

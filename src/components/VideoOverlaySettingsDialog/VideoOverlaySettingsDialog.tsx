@@ -1,5 +1,5 @@
 import React from 'react';
-
+import _ from 'lodash';
 import AudioInputList from './AudioInputList/AudioInputList';
 import AudioOutputList from './AudioOutputList/AudioOutputList';
 import {
@@ -13,9 +13,15 @@ import {
   Button,
   Theme,
   DialogTitle,
+  FormControl,
+  FormControlLabel,
+  Checkbox,
+  FormGroup,
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import VideoInputList from './VideoInputList/VideoInputList';
+
+import useOverlayContext from '../../hooks/useOverlayContext/useOverlayContext';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -75,10 +81,21 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 export default function VideoOverlaySettingsDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { markers, setMarkers } = useOverlayContext();
   const classes = useStyles();
   const theme = useTheme();
   let isStacked = useMediaQuery(theme.breakpoints.down('sm'));
   //console.log(isStacked);
+
+  const handleChange = (event: { target: HTMLInputElement }) => {
+    console.log('handling change');
+    const name: string = event.target.name;
+    const checked: boolean = event.target.checked;
+    let copy = [...markers];
+    let index = copy.findIndex(el => el.id === name);
+    copy[index] = { id: name, active: checked };
+    setMarkers(copy);
+  };
 
   return (
     <Dialog
@@ -92,6 +109,21 @@ export default function VideoOverlaySettingsDialog({ open, onClose }: { open: bo
       <Divider />
       <DialogContent className={classes.contents} id="dialogcontentcontainer">
         <div className={classes.listSection}>
+          <Typography variant="h6" className={classes.headline}>
+            Landmarks
+          </Typography>
+          <FormControl component="fieldset">
+            <FormGroup row>
+              {markers.map((marker, index) => (
+                <FormControlLabel
+                  control={<Checkbox checked={marker.active} onChange={handleChange} name={marker.id} />}
+                  label={marker.id.toUpperCase()}
+                />
+              ))}
+            </FormGroup>
+          </FormControl>
+        </div>
+        {/* <div className={classes.listSection}>
           <Typography variant="h6" className={classes.headline}>
             Video
           </Typography>
@@ -107,7 +139,7 @@ export default function VideoOverlaySettingsDialog({ open, onClose }: { open: bo
             Audio
           </Typography>
           <VideoInputList />
-        </div>
+        </div> */}
       </DialogContent>
       <Divider />
       <DialogActions>
