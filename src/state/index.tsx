@@ -16,6 +16,7 @@ export interface StateContextType {
   firebaseSignIn(email: string, password: string): Promise<void>;
   signOut?(): Promise<void>;
   isAuthReady?: boolean;
+  verifySessionId(sessionId: string): Promise<boolean>;
   isFetching: boolean;
   activeSinkId: string;
   setActiveSinkId(sinkId: string): void;
