@@ -52,19 +52,19 @@ export default function RoomNameScreen({ name, roomName, setName, setRoomName, h
   return (
     <>
       <Typography variant="h5" className={classes.gutterBottom}>
-        Join a Room
+        Join Teletraining Session
       </Typography>
       <Typography variant="body1">
         {hasUsername
           ? "Enter the name of a room you'd like to join."
-          : "Enter your name and the name of a room you'd like to join"}
+          : 'Enter your authorized email and the session code provided by the instructor.'}
       </Typography>
       <form onSubmit={handleSubmit}>
         <div className={classes.inputContainer}>
           {!hasUsername && (
             <div className={classes.textFieldContainer}>
               <InputLabel shrink htmlFor="input-user-name">
-                Your Name
+                Authorized Email
               </InputLabel>
               <TextField
                 id="input-user-name"
@@ -74,11 +74,12 @@ export default function RoomNameScreen({ name, roomName, setName, setRoomName, h
                 value={name}
                 onChange={handleNameChange}
               />
+              {/* <p>Must enter the same email used to access your MamamCare course.</p> */}
             </div>
           )}
           <div className={classes.textFieldContainer}>
             <InputLabel shrink htmlFor="input-room-name">
-              Room Name
+              Session Code
             </InputLabel>
             <TextField
               autoCapitalize="false"
