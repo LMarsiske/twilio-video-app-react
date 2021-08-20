@@ -1,0 +1,156 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{document=**} {
+      allow write: if request.auth != null; 
+      allow read: if request.auth != null;
+    }
+    match /importedFinalTable/{document=**} {
+      allow write: if request.auth != null; 
+      allow read: if request.auth != null;
+    }
+    match /legacyPracticeExams/{document=**} {
+      allow write: if request.auth != null; 
+      allow read: if request.auth != null;
+    }
+    match /manualExams/{document=**} {
+      allow write: if request.auth != null; 
+      allow read: if request.auth != null;
+    }
+    match /module2Results/{document=**} {
+      allow write: if request.auth != null; 
+      allow read: if request.auth != null;
+    }
+    match /module2Errors/{document=**} {
+      allow write: if request.auth != null; 
+      allow read: if request.auth != null;
+    }
+    match /module3Results/{document=**} {
+      allow write: if request.auth != null; 
+      allow read: if request.auth != null;
+    }
+    match /module3Errors/{document=**} {
+      allow write: if request.auth != null; 
+      allow read: if request.auth != null;
+    }
+    match /module4Results/{document=**} {
+      allow write: if request.auth != null; 
+      allow read: if request.auth != null;
+    }
+    match /module4Errors/{document=**} {
+      allow write: if request.auth != null; 
+      allow read: if request.auth != null;
+    }
+    match /approvedDomains/{domain} {
+      allow write: if request.auth != null; 
+      allow read
+    }
+    match /courseTemplates/{id} {
+      allow write: if request.auth != null;
+      allow read;
+    }
+    match /courseTemplates/{id}/{document=**} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+    match /courseActivities/{id} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+    match /courseResources/{id} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+    match /{path=**}/grades/{id} {
+      allow read: if request.auth != null;
+    }
+    match /{path=**}/courses/{id} {
+      allow read;
+      allow write: if request.auth != null;
+    }
+    match /cohorts/{id} {
+      allow read;
+      allow write;
+    }
+    match /cohorts/{id}/courseTemplates/{templateId} {
+      allow read;
+      allow write;
+    }
+    match /{path=**}/logs/{id} {
+      allow read;
+      allow write: if request.auth != null;
+    }
+    match /{path=**}/module2Attempts/{id} {
+      allow read;
+      allow write: if request.auth != null;
+    }
+    match /{path=**}/module3Attempts/{id} {
+      allow read;
+      allow write: if request.auth != null;
+    }
+    match /{path=**}/module4Attempts/{id} {
+      allow read;
+      allow write: if request.auth != null;
+    }
+    match /{path=**}/practiceAttempts/{id} {
+      allow read;
+      allow write: if request.auth != null;
+    }
+    match /errorLogs/{document=**} {
+    	allow read: if request.auth != null;
+    	allow write: if request.auth != null;
+    }
+    match /emailLogs/{document=**} {
+    	allow read: if request.auth != null;
+    	allow write;
+    }
+    match /p2PretrainingAttempts/{document=**} {
+    	allow read: if request.auth != null;
+    	allow write: if request.auth != null;
+    }
+    match /p2PostTrainingAttempts/{document=**} {
+    	allow read: if request.auth != null;
+    	allow write: if request.auth != null;
+    }
+    match /module2Attempts/{document=**} {
+    	allow read: if request.auth != null;
+    	allow write: if request.auth != null;
+    }
+    match /module3Attempts/{document=**} {
+    	allow read: if request.auth != null;
+    	allow write: if request.auth != null;
+    }
+    match /module4Attempts/{document=**} {
+    	allow read: if request.auth != null;
+    	allow write: if request.auth != null;
+    }
+    match /stripeProducts/{document=**} {
+    	allow read: if request.auth != null;
+    	allow write: if request.auth != null;
+    }
+    match /shippingProducts/{document=**} {
+    	allow read: if request.auth != null;
+    	allow write: if request.auth != null;
+    }
+    match /parcels/{document=**} {
+    	allow read: if request.auth != null;
+    	allow write: if request.auth != null;
+    }
+    match /parcels/{document=**} {
+    	allow read: if request.auth != null;
+    	allow write: if request.auth != null;
+    }
+    match /accessCodes/{document=**} {
+    	allow read: if request.auth != null;
+    	allow write: if request.auth != null;
+    }
+    match /tourUsers/{document=**} {
+    	allow read
+    	allow write: if request.auth != null;
+    }
+    match /moduleVideos/{document=**} {
+    	allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+  }
+}
