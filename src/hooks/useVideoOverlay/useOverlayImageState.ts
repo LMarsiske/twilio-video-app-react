@@ -1,21 +1,29 @@
 import React, { useCallback, useState } from 'react';
 import Konva from 'konva';
 
-export default function useSaveOverlayImage() {
+export default function useOverlayImageState() {
   const [overlayElements, setOverlayElements] = useState<{
     grid: Konva.Shape | null;
     lines: { tool: string; points: number[] }[] | null;
   }>({ grid: null, lines: null });
 
   const [isSavingAllowed, setIsSavingAllowed] = useState(false);
-  const [isResetAllowed, setIsResetAllowed] = useState(true);
+  const [isResetAllowed, setIsResetAllowed] = useState(false);
+
+  const [shouldClearVideoOverlay, setShouldClearVideoOverlay] = useState(false);
+
+  const toggleShouldClearOverlayState = (state: boolean) => {
+    setShouldClearVideoOverlay(state);
+    if (state === false) {
+      setIsResetAllowed(false);
+    }
+  };
 
   const updateOverlayElements = useCallback(
     (elements: { grid: Konva.Shape; lines: { tool: string; points: number[] }[] }) => {
-      console.log('New Elements: ', elements);
+      //console.log('New Elements: ', elements);
       setOverlayElements(elements);
       setIsSavingAllowed(elements.lines.length > 0 ? true : false);
-      setIsResetAllowed(elements.lines.length > 0 ? false : true);
     },
     [overlayElements]
   );
@@ -78,6 +86,7 @@ export default function useSaveOverlayImage() {
     );
 
     let pos = grid?.absolutePosition();
+    console.log(pos);
     if (grid?.attrs.rotation && grid?.attrs.rotation !== 0) {
       let xy = translateAndRotatePoints(
         [grid.absolutePosition().x, grid.absolutePosition().y],
@@ -88,10 +97,12 @@ export default function useSaveOverlayImage() {
           scaleX: grid.attrs.scaleX || 1,
           scaleY: grid.attrs.scaleY || 1,
         },
-        0 - grid.attrs.rotation
+        0 - grid.attrs.rotation,
+        true
       );
       pos = { x: xy[0], y: xy[1] };
     }
+    //console.log(pos);
     let offset = {
       x: pos?.x || 0,
       y: pos?.y || 0,
@@ -99,6 +110,7 @@ export default function useSaveOverlayImage() {
       scaleX: grid?.attrs.scaleX || 1,
       scaleY: grid?.attrs.scaleY || 1,
     };
+    console.log(offset);
     if (lines && lines.length > 0) {
       lines.forEach(line => {
         let points = translateAndRotatePoints([...line.points], offset, 0 - offset.rotation);
@@ -128,7 +140,8 @@ export default function useSaveOverlayImage() {
   const translateAndRotatePoints = (
     points: number[],
     offset: { x: number; y: number; rotation: number; scaleX: number; scaleY: number },
-    angle: number
+    angle: number,
+    ignoreOffset: boolean = false
   ) => {
     let cx = (500 * offset.scaleX) / 2;
     let cy = (500 * offset.scaleY) / 2;
@@ -141,6 +154,7 @@ export default function useSaveOverlayImage() {
     for (let i = 0; i < points.length; i += 2) {
       chunked.push(points.slice(i, i + 2));
     }
+
     let translated = chunked.map(chunk => {
       let x = chunk[0];
       let y = chunk[1];
@@ -148,12 +162,13 @@ export default function useSaveOverlayImage() {
       let nx = cos * (x - cx) - sin * (y - cy) + cx;
       let ny = cos * (y - cy) + sin * (x - cx) + cy;
 
-      if (offset.x || offset.y) {
-        return [nx - offset.x, ny - offset.y];
-      } else {
+      if (ignoreOffset) {
         return [nx, ny];
+      } else {
+        return [nx - offset.x || 0, ny - offset.y];
       }
     });
+    console.log(chunked, translated);
 
     return translated.flat();
   };
@@ -165,5 +180,7 @@ export default function useSaveOverlayImage() {
     saveImage,
     isResetAllowed,
     setIsResetAllowed,
+    shouldClearVideoOverlay,
+    toggleShouldClearOverlayState,
   ] as const;
 }

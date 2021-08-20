@@ -33,7 +33,7 @@ export default function ToggleOverlayModeButton(props: { disabled?: boolean }) {
   const screenShareParticipant = useScreenShareParticipant();
   const disableScreenShareButton = Boolean(screenShareParticipant);
   const isScreenShareSupported = navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia;
-  const isDisabled = props.disabled || disableScreenShareButton || !isScreenShareSupported;
+  const isDisabled = props.disabled;
   const { isOverlayDrawable, toggleOverlayDrawable } = useOverlayContext();
 
   let tooltipMessage = '';

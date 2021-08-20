@@ -17,7 +17,7 @@ import ToggleVideoButton from '../Buttons/ToggleVideoButton/ToggleVideoButton';
 import ToggleScreenShareButton from '../Buttons/ToogleScreenShareButton/ToggleScreenShareButton';
 import ToggleOverlayModeButton from '../Buttons/ToggleOverlayModeButton/ToggleOverlayModeButton';
 import SaveOverlayButton from '../Buttons/SaveOverlayButton/SaveOverlayButton';
-import ResetOverlayButton from '../Buttons/ResetOverlayButton/ResetOverlayButton';
+import ClearOverlayButton from '../Buttons/ClearOverlayButton/ClearOverlayButton';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -97,7 +97,7 @@ export default function MenuBar() {
               <Menu />
               <ToggleOverlayModeButton />
               <SaveOverlayButton />
-              <ResetOverlayButton />
+              <ClearOverlayButton />
             </Grid>
           </Grid>
           <Hidden smDown>

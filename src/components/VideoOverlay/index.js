@@ -47,7 +47,7 @@ const ContainedButton = withStyles(theme => ({
 const VideoOverlay = props => {
   const classes = useStyles();
   const { updateOverlayElements } = useOverlayContext();
-  const { isOverlayDrawable } = useOverlayContext();
+  const { isOverlayDrawable, shouldClearVideoOverlay, toggleShouldClearOverlayState } = useOverlayContext();
   const [tool, setTool] = React.useState('pen');
   const [lines, setLines] = React.useState([]);
   const [draggable, setDraggable] = useState(true);
@@ -84,6 +84,14 @@ const VideoOverlay = props => {
   useEffect(() => {
     updateOverlayElements({ grid: gridRef.current, lines: lines });
   }, [lines]);
+
+  useEffect(() => {
+    if (shouldClearVideoOverlay) {
+      setLines([]);
+      lineRefs.current = [];
+      toggleShouldClearOverlayState(false);
+    }
+  }, [shouldClearVideoOverlay]);
 
   const undoLine = () => {
     let [...copy] = lines;
@@ -227,7 +235,7 @@ const VideoOverlay = props => {
                   x: gridRef.current.absolutePosition().x,
                   y: gridRef.current.absolutePosition().y,
                 };
-                console.table(attrs.rotation, attrs.x, attrs.y);
+                //console.table(attrs.rotation, attrs.x, attrs.y);
               }}
             />
             <Rect ref={squareRef} width={500} height={500} strokeWidth={10} stroke={gridColor} />

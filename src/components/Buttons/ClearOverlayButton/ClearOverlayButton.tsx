@@ -2,7 +2,7 @@ import React from 'react';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 
 import Button from '@material-ui/core/Button';
-import { Replay } from '@material-ui/icons';
+import { Clear } from '@material-ui/icons';
 import Tooltip from '@material-ui/core/Tooltip';
 
 import useScreenShareParticipant from '../../../hooks/useScreenShareParticipant/useScreenShareParticipant';
@@ -30,16 +30,13 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export default function ResetOverlayButton(props: { disabled?: boolean }) {
   const classes = useStyles();
-  const { resetVideoOverlay, isResetAllowed } = useOverlayContext();
-  const screenShareParticipant = useScreenShareParticipant();
-  const disableScreenShareButton = Boolean(screenShareParticipant);
-  const isScreenShareSupported = navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia;
+  const { resetVideoOverlay, isResetAllowed, toggleShouldClearOverlayState } = useOverlayContext();
   const isDisabled = !isResetAllowed;
 
   let tooltipMessage = '';
 
   if (!isResetAllowed) {
-    tooltipMessage = 'Once you have drawn on the overlay it cannot be reset until you have saved at least once.';
+    tooltipMessage = 'The overlay cannot be cleared until it has been saved at least once.';
   }
 
   return (
@@ -54,12 +51,12 @@ export default function ResetOverlayButton(props: { disabled?: boolean }) {
           a tooltip when screen sharing is disabled */}
         <Button
           className={classes.button}
-          onClick={resetVideoOverlay}
+          onClick={() => toggleShouldClearOverlayState(true)}
           disabled={isDisabled}
-          startIcon={<Replay />}
+          startIcon={<Clear />}
           data-cy-share-screen
         >
-          Reset
+          Clear
         </Button>
       </span>
     </Tooltip>

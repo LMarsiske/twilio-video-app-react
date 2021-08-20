@@ -3,7 +3,7 @@ import Konva from 'konva';
 
 import useToggleVideoOverlay from '../../hooks/useVideoOverlay/useToggleVideoOverlay';
 import useToggleOverlayDrawing from '../../hooks/useVideoOverlay/useToggleOverlayDrawing';
-import useSaveOverlayImage from '../../hooks/useVideoOverlay/useSaveOverlayImage';
+import useOverlayImageState from '../../hooks/useVideoOverlay/useOverlayImageState';
 
 /*
  *  The hooks used by the VideoProvider component are different than the hooks found in the 'hooks/' directory. The hooks
@@ -23,6 +23,8 @@ export interface IOverlayContext {
   isSavingAllowed: boolean;
   saveImage: () => void;
   isResetAllowed: boolean;
+  shouldClearVideoOverlay: boolean;
+  toggleShouldClearOverlayState: (state: boolean) => void;
 }
 
 export const OverlayContext = createContext<IOverlayContext>(null!);
@@ -41,7 +43,9 @@ export function OverlayProvider({ children }: OverlayProviderProps) {
     saveImage,
     isResetAllowed,
     setIsResetAllowed,
-  ] = useSaveOverlayImage();
+    shouldClearVideoOverlay,
+    toggleShouldClearOverlayState,
+  ] = useOverlayImageState();
   return (
     <OverlayContext.Provider
       value={{
@@ -59,6 +63,8 @@ export function OverlayProvider({ children }: OverlayProviderProps) {
         isSavingAllowed,
         saveImage,
         isResetAllowed,
+        shouldClearVideoOverlay,
+        toggleShouldClearOverlayState,
       }}
     >
       {children}

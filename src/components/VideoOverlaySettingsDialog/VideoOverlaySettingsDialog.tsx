@@ -78,7 +78,7 @@ export default function VideoOverlaySettingsDialog({ open, onClose }: { open: bo
   const classes = useStyles();
   const theme = useTheme();
   let isStacked = useMediaQuery(theme.breakpoints.down('sm'));
-  console.log(isStacked);
+  //console.log(isStacked);
 
   return (
     <Dialog
