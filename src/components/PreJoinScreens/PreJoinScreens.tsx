@@ -15,6 +15,7 @@ export enum Steps {
 export default function PreJoinScreens() {
   const { user } = useAppState();
   const { getAudioAndVideoTracks } = useVideoContext();
+  const { isAuthReady, verifySessionId } = useAppState();
   const { URLRoomName } = useParams();
   const [step, setStep] = useState(Steps.roomNameStep);
 
@@ -42,13 +43,20 @@ export default function PreJoinScreens() {
     }
   }, [getAudioAndVideoTracks, step, mediaError]);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     // If this app is deployed as a twilio function, don't change the URL because routing isn't supported.
     if (!window.location.origin.includes('twil.io')) {
       window.history.replaceState(null, '', window.encodeURI(`/room/${roomName}${window.location.search || ''}`));
     }
-    setStep(Steps.deviceSelectionStep);
+
+    console.log('isAuthenticated: ', isAuthReady);
+    const validSessionId: boolean = await verifySessionId(roomName);
+    console.log('valid session id: ', validSessionId);
+    if (isAuthReady && validSessionId) setStep(Steps.deviceSelectionStep);
+    else {
+      alert('Invalid session code!');
+    }
   };
 
   return (

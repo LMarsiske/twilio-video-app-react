@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import * as firebase from 'firebase/app';
 import 'firebase/auth';
+import 'firebase/firebase-firestore';
 
 const firebaseConfig = {
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
   authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
   databaseURL: process.env.REACT_APP_FIREBASE_DATABASE_URL,
@@ -90,14 +92,6 @@ export default function useFirebaseAuth() {
   }, []);
 
   const firebaseSignIn = useCallback((email: string, password: string) => {
-    // const provider = new firebase.auth.EmailAuthProvider();
-    // provider.
-
-    console.log('Trying to sign in...');
-
-    // const email:string = "zrdeland@gmail.com";
-    // const pwd:string = "testtest";
-
     return firebase
       .auth()
       .signInWithEmailAndPassword(email, password)
@@ -116,5 +110,23 @@ export default function useFirebaseAuth() {
       });
   }, []);
 
-  return { user, firebaseSignIn, signOut, isAuthReady, getToken, updateRecordingRules };
+  // Firestore methods
+  const verifySessionId = useCallback(async (sessionId: string) => {
+    const docRef = firebase
+      .firestore()
+      .collection('videoSessions')
+      .doc(sessionId);
+    const doc = await docRef.get().catch(e => {
+      console.log(e);
+      return Promise.reject(false);
+    });
+    if (!doc.exists) {
+      return false;
+    } else {
+      console.log('Document data:', doc.data());
+      return true;
+    }
+  }, []);
+
+  return { user, firebaseSignIn, signOut, isAuthReady, getToken, updateRecordingRules, verifySessionId };
 }
