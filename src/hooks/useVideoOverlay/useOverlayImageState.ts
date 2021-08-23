@@ -16,8 +16,9 @@ export default function useOverlayImageState() {
 
   const [isSavingAllowed, setIsSavingAllowed] = useState(false);
   const [isResetAllowed, setIsResetAllowed] = useState(false);
-
+  const [canUndoLastLine, setCanUndoLastLine] = useState(false);
   const [shouldClearVideoOverlay, setShouldClearVideoOverlay] = useState(false);
+  const [shouldUndoLastLine, setShouldUndoLastLine] = useState(false);
 
   const toggleShouldClearOverlayState = (state: boolean) => {
     setShouldClearVideoOverlay(state);
@@ -26,11 +27,16 @@ export default function useOverlayImageState() {
     }
   };
 
+  const toggleShouldUndoLastLine = (state: boolean) => {
+    setShouldUndoLastLine(state);
+  };
+
   const updateOverlayElements = useCallback(
     (elements: { grid: Konva.Shape; lines: { tool: string; points: number[] }[]; activeMarkers: Konva.Text[] }) => {
       console.log('New Elements: ', elements);
       setOverlayElements(elements);
       setIsSavingAllowed(elements.lines.length > 0 ? true : false);
+      setCanUndoLastLine(elements.lines.length > 0 ? true : false);
     },
     [overlayElements]
   );
@@ -211,5 +217,8 @@ export default function useOverlayImageState() {
     toggleShouldClearOverlayState,
     markers,
     setMarkers,
+    canUndoLastLine,
+    shouldUndoLastLine,
+    toggleShouldUndoLastLine,
   ] as const;
 }

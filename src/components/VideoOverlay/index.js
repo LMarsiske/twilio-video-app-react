@@ -46,8 +46,16 @@ const ContainedButton = withStyles(theme => ({
 
 const VideoOverlay = props => {
   const classes = useStyles();
-  const { updateOverlayElements, markers } = useOverlayContext();
-  const { isOverlayDrawable, shouldClearVideoOverlay, toggleShouldClearOverlayState } = useOverlayContext();
+  const {
+    updateOverlayElements,
+    markers,
+    isOverlayDrawable,
+    shouldClearVideoOverlay,
+    toggleShouldClearOverlayState,
+    shouldUndoLastLine,
+    toggleShouldUndoLastLine,
+  } = useOverlayContext();
+  const {} = useOverlayContext();
   const [tool, setTool] = React.useState('pen');
   const [lines, setLines] = React.useState([]);
   const [selectedMarkers, setSelectedMarkers] = useState([]);
@@ -126,18 +134,14 @@ const VideoOverlay = props => {
     }
   }, [shouldClearVideoOverlay]);
 
-  const undoLine = () => {
-    let [...copy] = lines;
-    copy.pop();
-    setLines(copy);
-  };
-
-  const checkDeselect = e => {
-    const clickedOnEmpty = e.target === e.target.getStage();
-    if (clickedOnEmpty) {
-      setSelected(null);
+  useEffect(() => {
+    if (shouldUndoLastLine) {
+      let [...copy] = lines;
+      copy.pop();
+      setLines(copy);
+      toggleShouldUndoLastLine(false);
     }
-  };
+  }, [shouldUndoLastLine]);
 
   const handleMouseDown = e => {
     const pos = e.target.getStage().getPointerPosition();

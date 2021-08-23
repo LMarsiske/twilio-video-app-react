@@ -32,6 +32,9 @@ export interface IOverlayContext {
   toggleShouldClearOverlayState: (state: boolean) => void;
   markers: { id: string; active: boolean }[];
   setMarkers: (markers: { id: string; active: boolean }[]) => void;
+  canUndoLastLine: boolean;
+  shouldUndoLastLine: boolean;
+  toggleShouldUndoLastLine: (state: boolean) => void;
 }
 
 export const OverlayContext = createContext<IOverlayContext>(null!);
@@ -54,6 +57,9 @@ export function OverlayProvider({ children }: OverlayProviderProps) {
     toggleShouldClearOverlayState,
     markers,
     setMarkers,
+    canUndoLastLine,
+    shouldUndoLastLine,
+    toggleShouldUndoLastLine,
   ] = useOverlayImageState();
   return (
     <OverlayContext.Provider
@@ -76,6 +82,9 @@ export function OverlayProvider({ children }: OverlayProviderProps) {
         toggleShouldClearOverlayState,
         markers,
         setMarkers: markers => setMarkers(markers),
+        canUndoLastLine,
+        shouldUndoLastLine,
+        toggleShouldUndoLastLine,
       }}
     >
       {children}
