@@ -3,6 +3,8 @@ import firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/firebase-firestore';
 import 'firebase/storage';
+import Konva from 'konva';
+import { isNull } from 'util';
 
 const firebaseConfig = {
   projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
@@ -17,6 +19,7 @@ export default function useFirebaseAuth() {
   const [user, setUser] = useState<firebase.User | null>(null);
   const [isAuthReady, setIsAuthReady] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [sessionData, setSessionData] = useState<firebase.firestore.DocumentData | null>(null);
 
   const getToken = useCallback(
     async (user_identity: string, room_name: string) => {
@@ -76,7 +79,9 @@ export default function useFirebaseAuth() {
   useEffect(() => {
     firebase.initializeApp(firebaseConfig);
     firebase.auth().onAuthStateChanged(newUser => {
+      console.log(newUser);
       setUser(newUser);
+      getUserRole(newUser?.uid || '');
       setIsAuthReady(true);
     });
   }, []);
@@ -98,6 +103,7 @@ export default function useFirebaseAuth() {
       .auth()
       .signInWithEmailAndPassword(email, password)
       .then(newUser => {
+        console.log(newUser);
         setUser(newUser.user);
         getUserRole(newUser?.user?.uid || '');
         console.log('User authenticated.');
@@ -127,12 +133,15 @@ export default function useFirebaseAuth() {
       return false;
     } else {
       console.log('Document data:', doc.data());
+      setSessionData(doc?.data() || null);
       return true;
     }
   }, []);
 
-  const getUserRole = useCallback(async (userId: string) => {
-    if (userId) {
+  const getUserRole = async (userId: string) => {
+    console.log('USER ID: ', userId);
+    if (userId === '') {
+      console.log('userId is empty string');
       setIsAdmin(false);
       return;
     }
@@ -151,24 +160,61 @@ export default function useFirebaseAuth() {
       if (roles.includes('ADMIN')) setIsAdmin(true);
       else setIsAdmin(false);
     }
-  }, []);
+  };
 
-  // const saveVirtualGridOverlay = useCallback(async (userId: string) => {
-  //   const docRef = firebase
-  //     .storage()
-  //     .collection('users')
-  //     .doc(userId);
-  //   const doc = await docRef.get().catch(e => {
-  //     console.log(e);
-  //     return Promise.reject(false);
-  //   });
-  //   if (!doc.exists) {
-  //     return [];
-  //   } else {
-  //     let roles = doc?.data()?.roles || [];
-  //     return roles;
-  //   }
-  // }, []);
+  const saveVirtualGridOverlay = async (uid: string, fileName: string, group: Konva.Group) => {
+    console.log('Saving virtual overlay: ', sessionData);
+    if (!sessionData) {
+      return;
+    }
 
-  return { user, firebaseSignIn, signOut, isAuthReady, getToken, updateRecordingRules, verifySessionId, isAdmin };
+    let fileRef = firebase.storage().ref(`profileDocs/${sessionData!.traineeId}/teletrainingDataGrids/${fileName}.png`);
+    let url = group.toDataURL({ pixelRatio: 2 });
+    let blob = convertURLToBlob(url);
+    if (blob) {
+      fileRef
+        .put(blob)
+        .then(() => console.log('uploaded a blob'))
+        .catch(e => console.log(e));
+    }
+  };
+
+  const convertURLToBlob = (url: string | undefined) => {
+    if (url) {
+      let byteString = atob(url.split(',')[1]);
+
+      // separate out the mime component
+      let mimeString = url
+        .split(',')[0]
+        .split(':')[1]
+        .split(';')[0];
+
+      // write the bytes of the string to an ArrayBuffer
+      let ab = new ArrayBuffer(byteString.length);
+
+      // create a view into the buffer
+      let ia = new Uint8Array(ab);
+
+      // set the bytes of the buffer to the correct values
+      for (let i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+      }
+
+      // write the ArrayBuffer to a blob, and you're done
+      let blob = new Blob([ab], { type: mimeString });
+      return blob;
+    }
+  };
+
+  return {
+    user,
+    firebaseSignIn,
+    signOut,
+    isAuthReady,
+    getToken,
+    updateRecordingRules,
+    verifySessionId,
+    isAdmin,
+    saveVirtualGridOverlay,
+  };
 }

@@ -18,6 +18,7 @@ import useTrack from '../../hooks/useTrack/useTrack';
 import useVideoContext from '../../hooks/useVideoContext/useVideoContext';
 
 import useOverlayContext from '../../hooks/useOverlayContext/useOverlayContext';
+import { useAppState } from '../../state';
 
 import VideoOverlay from '../VideoOverlay';
 import useWindowSize from '../../hooks/useWindowSize/useWindowSize';
@@ -125,6 +126,7 @@ export default function MainParticipantInfo({ participant, children }: MainParti
   const classes = useStyles();
   const { room } = useVideoContext();
   const { isOverlayEnabled } = useOverlayContext();
+  const { isAdmin } = useAppState();
   const localParticipant = room!.localParticipant;
   const isLocal = localParticipant === participant;
 
@@ -167,7 +169,7 @@ export default function MainParticipantInfo({ participant, children }: MainParti
         [classes.fullWidth]: !isRemoteParticipantScreenSharing,
       })}
     >
-      {isOverlayEnabled ? <VideoOverlay size={size} /> : null}
+      {isOverlayEnabled && isAdmin ? <VideoOverlay size={size} /> : null}
       <div className={classes.infoContainer}>
         <div style={{ display: 'flex' }}>
           <div className={classes.identity}>

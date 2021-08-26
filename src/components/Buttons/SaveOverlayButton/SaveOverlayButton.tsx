@@ -9,6 +9,7 @@ import useScreenShareParticipant from '../../../hooks/useScreenShareParticipant/
 import useVideoContext from '../../../hooks/useVideoContext/useVideoContext';
 
 import useOverlayContext from '../../../hooks/useOverlayContext/useOverlayContext';
+import { useAppState } from '../../../state';
 
 export const SCREEN_SHARE_TEXT = 'Share Screen';
 export const STOP_SCREEN_SHARE_TEXT = 'Stop Sharing Screen';
@@ -31,6 +32,7 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function SaveOverlayButton(props: { disabled?: boolean }) {
   const classes = useStyles();
   const { saveImage, isSavingAllowed } = useOverlayContext();
+  const { saveVirtualGridOverlay, user } = useAppState();
   const screenShareParticipant = useScreenShareParticipant();
   const disableScreenShareButton = Boolean(screenShareParticipant);
   const isScreenShareSupported = navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia;
@@ -41,6 +43,11 @@ export default function SaveOverlayButton(props: { disabled?: boolean }) {
   if (!isSavingAllowed) {
     tooltipMessage = 'The overlay cannot be saved until at least one mark has been drawn on it.';
   }
+
+  const handleClick = () => {
+    let group = saveImage();
+    saveVirtualGridOverlay(user?.displayName || 'test', 'test', group);
+  };
 
   return (
     <Tooltip
@@ -54,7 +61,7 @@ export default function SaveOverlayButton(props: { disabled?: boolean }) {
           a tooltip when screen sharing is disabled */}
         <Button
           className={classes.button}
-          onClick={saveImage}
+          onClick={handleClick}
           disabled={isDisabled}
           startIcon={<Save />}
           data-cy-share-screen

@@ -10,6 +10,7 @@ import Menu from './Menu/Menu';
 import useRoomState from '../../hooks/useRoomState/useRoomState';
 import useVideoContext from '../../hooks/useVideoContext/useVideoContext';
 import useOverlayContext from '../../hooks/useOverlayContext/useOverlayContext';
+import { useAppState } from '../../state';
 import { Typography, Grid, Hidden } from '@material-ui/core';
 import ToggleAudioButton from '../Buttons/ToggleAudioButton/ToggleAudioButton';
 import ToggleChatButton from '../Buttons/ToggleChatButton/ToggleChatButton';
@@ -75,6 +76,7 @@ export default function MenuBar() {
   const roomState = useRoomState();
   const isReconnecting = roomState === 'reconnecting';
   const { room } = useVideoContext();
+  const { isAdmin } = useAppState();
 
   return (
     <>
@@ -92,14 +94,16 @@ export default function MenuBar() {
               <ToggleVideoButton disabled={isReconnecting} />
             </Grid>
           </Hidden>
-          <Grid item>
-            <Grid container justifyContent="center">
-              <Menu />
-              <ToggleOverlayModeButton />
-              <SaveOverlayButton />
-              <ClearOverlayButton />
+          {isAdmin ? (
+            <Grid item>
+              <Grid container justifyContent="center">
+                <Menu />
+                <ToggleOverlayModeButton />
+                <SaveOverlayButton />
+                <ClearOverlayButton />
+              </Grid>
             </Grid>
-          </Grid>
+          ) : null}
           <Hidden smDown>
             <Grid style={{ flex: 1 }}>
               <Grid container justifyContent="flex-end">

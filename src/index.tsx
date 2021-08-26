@@ -15,6 +15,7 @@ import './types';
 import { ChatProvider } from './components/ChatProvider';
 import { VideoProvider } from './components/VideoProvider';
 import { OverlayProvider } from './components/OverlayProvider';
+import { FirebaseProvider } from './components/FirebaseProvider';
 import useConnectionOptions from './utils/useConnectionOptions/useConnectionOptions';
 import UnsupportedBrowserWarning from './components/UnsupportedBrowserWarning/UnsupportedBrowserWarning';
 

@@ -161,13 +161,14 @@ export default function useOverlayImageState() {
         );
       });
     }
-    let url = group.toDataURL({ pixelRatio: 2 });
-    let hiddenElement = document.createElement('a');
-    hiddenElement.href = url;
-    hiddenElement.target = '_blank';
-    hiddenElement.download = 'stage.png';
-    hiddenElement.click();
-    setIsResetAllowed(true);
+    //let url = group.toDataURL({ pixelRatio: 2 });
+    return group;
+    // let hiddenElement = document.createElement('a');
+    // hiddenElement.href = url;
+    // hiddenElement.target = '_blank';
+    // hiddenElement.download = 'stage.png';
+    // hiddenElement.click();
+    // setIsResetAllowed(true);
   };
 
   const translateAndRotatePoints = (
