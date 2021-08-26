@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/firebase-firestore';
+import 'firebase/storage';
 
 const firebaseConfig = {
   projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
@@ -15,6 +16,7 @@ const firebaseConfig = {
 export default function useFirebaseAuth() {
   const [user, setUser] = useState<firebase.User | null>(null);
   const [isAuthReady, setIsAuthReady] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const getToken = useCallback(
     async (user_identity: string, room_name: string) => {
@@ -97,6 +99,7 @@ export default function useFirebaseAuth() {
       .signInWithEmailAndPassword(email, password)
       .then(newUser => {
         setUser(newUser.user);
+        getUserRole(newUser?.user?.uid || '');
         console.log('User authenticated.');
       });
   }, []);
@@ -128,5 +131,44 @@ export default function useFirebaseAuth() {
     }
   }, []);
 
-  return { user, firebaseSignIn, signOut, isAuthReady, getToken, updateRecordingRules, verifySessionId };
+  const getUserRole = useCallback(async (userId: string) => {
+    if (userId) {
+      setIsAdmin(false);
+      return;
+    }
+    const docRef = firebase
+      .firestore()
+      .collection('users')
+      .doc(userId);
+    const doc = await docRef.get().catch(e => {
+      console.log(e);
+      return Promise.reject(false);
+    });
+    if (!doc.exists) {
+      setIsAdmin(false);
+    } else {
+      let roles = doc?.data()?.roles || [];
+      if (roles.includes('ADMIN')) setIsAdmin(true);
+      else setIsAdmin(false);
+    }
+  }, []);
+
+  // const saveVirtualGridOverlay = useCallback(async (userId: string) => {
+  //   const docRef = firebase
+  //     .storage()
+  //     .collection('users')
+  //     .doc(userId);
+  //   const doc = await docRef.get().catch(e => {
+  //     console.log(e);
+  //     return Promise.reject(false);
+  //   });
+  //   if (!doc.exists) {
+  //     return [];
+  //   } else {
+  //     let roles = doc?.data()?.roles || [];
+  //     return roles;
+  //   }
+  // }, []);
+
+  return { user, firebaseSignIn, signOut, isAuthReady, getToken, updateRecordingRules, verifySessionId, isAdmin };
 }
