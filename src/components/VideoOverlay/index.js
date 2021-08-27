@@ -139,6 +139,7 @@ const VideoOverlay = props => {
       let [...copy] = lines;
       copy.pop();
       setLines(copy);
+      lineRefs.current.pop();
       toggleShouldUndoLastLine(false);
     }
   }, [shouldUndoLastLine]);
@@ -379,7 +380,7 @@ const N = forwardRef((props, ref) => {
         ref={ref}
         draggable={draggable}
         text="N"
-        fontSize={64}
+        fontSize={32}
         fontStyle="bold"
         x={x}
         y={y}
@@ -421,7 +422,7 @@ const V = forwardRef((props, ref) => {
         ref={ref}
         draggable={draggable}
         text="V"
-        fontSize={64}
+        fontSize={32}
         fontStyle="bold"
         x={x}
         y={y}
@@ -462,7 +463,7 @@ const A = forwardRef((props, ref) => {
         ref={ref}
         draggable={draggable}
         text="A"
-        fontSize={64}
+        fontSize={32}
         fontStyle="bold"
         x={x}
         y={y}
@@ -504,7 +505,7 @@ const S = forwardRef((props, ref) => {
         ref={ref}
         draggable={draggable}
         text="S"
-        fontSize={64}
+        fontSize={32}
         fontStyle="bold"
         x={x}
         y={y}

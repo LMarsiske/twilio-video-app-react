@@ -162,14 +162,13 @@ export default function useFirebaseAuth() {
     }
   };
 
-  const saveVirtualGridOverlay = async (uid: string, fileName: string, group: Konva.Group) => {
+  const saveVirtualGridOverlay = async (fileName: string, url: string) => {
     console.log('Saving virtual overlay: ', sessionData);
     if (!sessionData) {
       return;
     }
 
     let fileRef = firebase.storage().ref(`profileDocs/${sessionData!.traineeId}/teletrainingDataGrids/${fileName}.png`);
-    let url = group.toDataURL({ pixelRatio: 2 });
     let blob = convertURLToBlob(url);
     if (blob) {
       fileRef

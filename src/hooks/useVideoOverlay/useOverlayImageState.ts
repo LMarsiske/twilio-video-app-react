@@ -33,7 +33,6 @@ export default function useOverlayImageState() {
 
   const updateOverlayElements = useCallback(
     (elements: { grid: Konva.Shape; lines: { tool: string; points: number[] }[]; activeMarkers: Konva.Text[] }) => {
-      console.log('New Elements: ', elements);
       setOverlayElements(elements);
       setIsSavingAllowed(elements.lines.length > 0 ? true : false);
       setCanUndoLastLine(elements.lines.length > 0 ? true : false);
@@ -124,6 +123,34 @@ export default function useOverlayImageState() {
       scaleY: grid?.attrs.scaleY || 1,
     };
     console.log(offset);
+    if (activeMarkers && activeMarkers.length > 0) {
+      activeMarkers.forEach(marker => {
+        console.log(marker.attrs);
+        let newScale = {
+          scaleX: Number.isNaN(marker.attrs.scaleX / grid?.attrs.scaleX) ? 1 : marker.attrs.scaleX / grid?.attrs.scaleX,
+          scaleY: Number.isNaN(marker.attrs.scaleY / grid?.attrs.scaleY) ? 1 : marker.attrs.scaleY / grid?.attrs.scaleY,
+        };
+        let coords = translateAndRotatePoints(
+          [marker.getAbsolutePosition().x, marker.getAbsolutePosition().y],
+          {
+            ...offset,
+            ...newScale,
+          },
+          0 - offset.rotation
+        );
+        group.add(
+          new Konva.Text({
+            text: marker.text(),
+            x: coords[0],
+            y: coords[1],
+            fontSize: 32,
+            stroke: 'green',
+            fill: 'green',
+            rotation: 0 - offset.rotation + marker.attrs.rotation,
+          })
+        );
+      });
+    }
     if (lines && lines.length > 0) {
       lines.forEach(line => {
         let points = translateAndRotatePoints([...line.points], offset, 0 - offset.rotation);
@@ -141,28 +168,10 @@ export default function useOverlayImageState() {
         );
       });
     }
-    if (activeMarkers && activeMarkers.length > 0) {
-      activeMarkers.forEach(marker => {
-        let coords = translateAndRotatePoints(
-          [marker.getAbsolutePosition().x, marker.getAbsolutePosition().y],
-          offset,
-          marker.attrs.rotation
-        );
-        console.log(marker.text(), coords);
-        group.add(
-          new Konva.Text({
-            text: marker.text(),
-            x: coords[0],
-            y: coords[1],
-            fontSize: 32,
-            stroke: 'green',
-            fill: 'green',
-          })
-        );
-      });
-    }
-    //let url = group.toDataURL({ pixelRatio: 2 });
-    return group;
+
+    let url = group.toDataURL({ pixelRatio: 2 });
+    return { url: url, group: group };
+
     // let hiddenElement = document.createElement('a');
     // hiddenElement.href = url;
     // hiddenElement.target = '_blank';
@@ -182,7 +191,7 @@ export default function useOverlayImageState() {
     let radians = (Math.PI / 180) * angle;
     let cos = Math.cos(radians);
     let sin = Math.sin(radians);
-    console.log(angle);
+    console.log(angle, offset);
 
     let chunked = [];
     for (let i = 0; i < points.length; i += 2) {
@@ -199,7 +208,7 @@ export default function useOverlayImageState() {
       if (ignoreOffset) {
         return [nx, ny];
       } else {
-        return [nx - offset.x || 0, ny - offset.y];
+        return [nx - offset.x, ny - offset.y];
       }
     });
     console.log(chunked, translated);

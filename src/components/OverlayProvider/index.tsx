@@ -26,7 +26,7 @@ export interface IOverlayContext {
     activeMarkers: Konva.Text[];
   }) => void;
   isSavingAllowed: boolean;
-  saveImage: () => Konva.Group;
+  saveImage: () => { group: Konva.Group; url: string };
   isResetAllowed: boolean;
   shouldClearVideoOverlay: boolean;
   toggleShouldClearOverlayState: (state: boolean) => void;

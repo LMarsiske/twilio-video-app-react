@@ -26,7 +26,7 @@ export interface StateContextType {
   roomType?: RoomType;
   updateRecordingRules(room_sid: string, rules: RecordingRules): Promise<object>;
   isAdmin: boolean;
-  saveVirtualGridOverlay: (uid: string, fileName: string, group: Konva.Group) => Promise<void>;
+  saveVirtualGridOverlay: (fileName: string, url: string) => Promise<void>;
 }
 
 export const StateContext = createContext<StateContextType>(null!);

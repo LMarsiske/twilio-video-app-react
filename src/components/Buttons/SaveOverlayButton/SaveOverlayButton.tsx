@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 
 import Button from '@material-ui/core/Button';
@@ -10,6 +10,9 @@ import useVideoContext from '../../../hooks/useVideoContext/useVideoContext';
 
 import useOverlayContext from '../../../hooks/useOverlayContext/useOverlayContext';
 import { useAppState } from '../../../state';
+
+import SaveVideoOverlayDialog from '../../SaveVideoOverlayDialog/VideoOverlaySettingsDialog';
+import Konva from 'konva';
 
 export const SCREEN_SHARE_TEXT = 'Share Screen';
 export const STOP_SCREEN_SHARE_TEXT = 'Stop Sharing Screen';
@@ -34,8 +37,9 @@ export default function SaveOverlayButton(props: { disabled?: boolean }) {
   const { saveImage, isSavingAllowed } = useOverlayContext();
   const { saveVirtualGridOverlay, user } = useAppState();
   const screenShareParticipant = useScreenShareParticipant();
-  const disableScreenShareButton = Boolean(screenShareParticipant);
-  const isScreenShareSupported = navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia;
+  const [open, setOpen] = useState(false);
+  const [overlay, setOverlay] = useState<{ group: Konva.Group; url: string } | null>(null);
+
   const isDisabled = !isSavingAllowed;
 
   let tooltipMessage = '';
@@ -45,30 +49,35 @@ export default function SaveOverlayButton(props: { disabled?: boolean }) {
   }
 
   const handleClick = () => {
-    let group = saveImage();
-    saveVirtualGridOverlay(user?.displayName || 'test', 'test', group);
+    let overlay = saveImage();
+    setOverlay(overlay);
+    setOpen(true);
+    // saveVirtualGridOverlay(user?.displayName || 'test', 'test', group.url);
   };
 
   return (
-    <Tooltip
-      title={tooltipMessage}
-      placement="top"
-      PopperProps={{ disablePortal: true }}
-      style={{ cursor: isDisabled ? 'not-allowed' : 'pointer' }}
-    >
-      <span>
-        {/* The span element is needed because a disabled button will not emit hover events and we want to display
+    <>
+      <Tooltip
+        title={tooltipMessage}
+        placement="top"
+        PopperProps={{ disablePortal: true }}
+        style={{ cursor: isDisabled ? 'not-allowed' : 'pointer' }}
+      >
+        <span>
+          {/* The span element is needed because a disabled button will not emit hover events and we want to display
           a tooltip when screen sharing is disabled */}
-        <Button
-          className={classes.button}
-          onClick={handleClick}
-          disabled={isDisabled}
-          startIcon={<Save />}
-          data-cy-share-screen
-        >
-          Save
-        </Button>
-      </span>
-    </Tooltip>
+          <Button
+            className={classes.button}
+            onClick={handleClick}
+            disabled={isDisabled}
+            startIcon={<Save />}
+            data-cy-share-screen
+          >
+            Save
+          </Button>
+        </span>
+      </Tooltip>
+      <SaveVideoOverlayDialog open={open} onClose={() => setOpen(false)} overlay={overlay} />
+    </>
   );
 }
