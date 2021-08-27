@@ -130,6 +130,9 @@ export default function useOverlayImageState() {
           scaleX: Number.isNaN(marker.attrs.scaleX / grid?.attrs.scaleX) ? 1 : marker.attrs.scaleX / grid?.attrs.scaleX,
           scaleY: Number.isNaN(marker.attrs.scaleY / grid?.attrs.scaleY) ? 1 : marker.attrs.scaleY / grid?.attrs.scaleY,
         };
+        let newRotation = Number.isNaN(0 - offset.rotation + marker.attrs.rotation)
+          ? 0
+          : 0 - offset.rotation + marker.attrs.rotation;
         let coords = translateAndRotatePoints(
           [marker.getAbsolutePosition().x, marker.getAbsolutePosition().y],
           {
@@ -146,7 +149,7 @@ export default function useOverlayImageState() {
             fontSize: 32,
             stroke: 'green',
             fill: 'green',
-            rotation: 0 - offset.rotation + marker.attrs.rotation,
+            rotation: newRotation,
           })
         );
       });

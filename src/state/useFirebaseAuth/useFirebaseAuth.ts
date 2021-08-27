@@ -168,7 +168,9 @@ export default function useFirebaseAuth() {
       return;
     }
 
-    let fileRef = firebase.storage().ref(`profileDocs/${sessionData!.traineeId}/teletrainingDataGrids/${fileName}.png`);
+    let fileRef = firebase
+      .storage()
+      .ref(`profileDocs/${sessionData!.traineeId}/teletrainingDataGrids/${fileName}_${Date.now()}.png`);
     let blob = convertURLToBlob(url);
     if (blob) {
       fileRef
