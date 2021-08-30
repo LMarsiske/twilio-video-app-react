@@ -16,7 +16,7 @@ export default function useOverlayImageState() {
   }>({ grid: null, lines: null, activeMarkers: null });
   const [gridColor, setGridColor] = useState('#ffffff');
   const [strokeColor, setStrokeColor] = useState('#181e85');
-  const [markerColor, setMarkerColor] = useState('#196b0b');
+  const [markerColor, setMarkerColor] = useState('#000000');
 
   const [isSavingAllowed, setIsSavingAllowed] = useState(false);
   const [isResetAllowed, setIsResetAllowed] = useState(false);
@@ -151,8 +151,8 @@ export default function useOverlayImageState() {
             x: coords[0],
             y: coords[1],
             fontSize: 32,
-            stroke: 'green',
-            fill: 'green',
+            stroke: 'black',
+            fill: 'black',
             rotation: newRotation,
           })
         );
