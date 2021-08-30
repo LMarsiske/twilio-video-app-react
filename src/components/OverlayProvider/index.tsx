@@ -5,6 +5,7 @@ import useToggleVideoOverlay from '../../hooks/useVideoOverlay/useToggleVideoOve
 import useToggleOverlayDrawing from '../../hooks/useVideoOverlay/useToggleOverlayDrawing';
 import useOverlayImageState from '../../hooks/useVideoOverlay/useOverlayImageState';
 import firebase from 'firebase';
+import { Color } from 'react-color';
 
 /*
  *  The hooks used by the VideoProvider component are different than the hooks found in the 'hooks/' directory. The hooks
@@ -35,6 +36,12 @@ export interface IOverlayContext {
   canUndoLastLine: boolean;
   shouldUndoLastLine: boolean;
   toggleShouldUndoLastLine: (state: boolean) => void;
+  gridColor: string;
+  setGridColor: (color: string) => void;
+  strokeColor: string;
+  setStrokeColor: (color: string) => void;
+  markerColor: string;
+  setMarkerColor: (color: string) => void;
 }
 
 export const OverlayContext = createContext<IOverlayContext>(null!);
@@ -60,6 +67,12 @@ export function OverlayProvider({ children }: OverlayProviderProps) {
     canUndoLastLine,
     shouldUndoLastLine,
     toggleShouldUndoLastLine,
+    gridColor,
+    setGridColor,
+    strokeColor,
+    setStrokeColor,
+    markerColor,
+    setMarkerColor,
   ] = useOverlayImageState();
   return (
     <OverlayContext.Provider
@@ -85,6 +98,12 @@ export function OverlayProvider({ children }: OverlayProviderProps) {
         canUndoLastLine,
         shouldUndoLastLine,
         toggleShouldUndoLastLine,
+        gridColor,
+        setGridColor,
+        strokeColor,
+        setStrokeColor,
+        markerColor,
+        setMarkerColor,
       }}
     >
       {children}

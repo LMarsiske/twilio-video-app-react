@@ -54,6 +54,9 @@ const VideoOverlay = props => {
     toggleShouldClearOverlayState,
     shouldUndoLastLine,
     toggleShouldUndoLastLine,
+    gridColor,
+    markerColor,
+    strokeColor,
   } = useOverlayContext();
   const {} = useOverlayContext();
   const [tool, setTool] = React.useState('pen');
@@ -63,9 +66,9 @@ const VideoOverlay = props => {
   const [drawable, setDrawable] = useState(false);
   const [gridWidth, setGridWidth] = useState(3);
   const [strokeWidth, setStrokeWidth] = useState(3);
-  const [gridColor, setGridColor] = useState('#ffffff');
-  const [strokeColor, setStrokeColor] = useState('blue');
-  const [markerColor, setMarkerColor] = useState('green');
+  // const [gridColor, setGridColor] = useState('#ffffff');
+  // const [strokeColor, setStrokeColor] = useState('blue');
+  // const [markerColor, setMarkerColor] = useState('green');
   const [showGridColorPicker, setShowGridColorPicker] = useState(false);
   const [showStrokeColorPicker, setShowStrokeColorPicker] = useState(false);
   const [selected, setSelected] = useState(false);

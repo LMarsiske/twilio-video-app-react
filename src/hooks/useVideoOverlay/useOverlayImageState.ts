@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import Konva from 'konva';
+import { Color } from 'react-color';
 
 export default function useOverlayImageState() {
   const [markers, setMarkers] = useState<{ id: string; active: boolean }[]>([
@@ -13,6 +14,9 @@ export default function useOverlayImageState() {
     lines: { tool: string; points: number[] }[] | null;
     activeMarkers: Konva.Text[] | null;
   }>({ grid: null, lines: null, activeMarkers: null });
+  const [gridColor, setGridColor] = useState('#ffffff');
+  const [strokeColor, setStrokeColor] = useState('#181e85');
+  const [markerColor, setMarkerColor] = useState('#196b0b');
 
   const [isSavingAllowed, setIsSavingAllowed] = useState(false);
   const [isResetAllowed, setIsResetAllowed] = useState(false);
@@ -233,5 +237,11 @@ export default function useOverlayImageState() {
     canUndoLastLine,
     shouldUndoLastLine,
     toggleShouldUndoLastLine,
+    gridColor,
+    setGridColor,
+    strokeColor,
+    setStrokeColor,
+    markerColor,
+    setMarkerColor,
   ] as const;
 }
