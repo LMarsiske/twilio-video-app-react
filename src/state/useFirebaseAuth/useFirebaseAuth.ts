@@ -122,14 +122,14 @@ export default function useFirebaseAuth() {
       if (user?.uid) {
         const docRef = firebase.firestore().collection('videoSessions');
 
-        const snapshot = await docRef
-          .where('sessionId', '==', sessionId)
-          .where('traineeId', '==', user?.uid)
-          .get();
+        const snapshot = await docRef.where('sessionId', '==', sessionId).get();
         if (snapshot.empty) {
           return false;
         } else {
-          if (snapshot.size == 1) {
+          if (
+            (snapshot.size == 1 && snapshot.docs[0]?.data().hostId == user?.uid) ||
+            snapshot.docs[0]?.data().traineeId == user?.uid
+          ) {
             setSessionData(snapshot.docs[0]?.data() || null);
             return true;
           } else if (snapshot.size > 1) {
