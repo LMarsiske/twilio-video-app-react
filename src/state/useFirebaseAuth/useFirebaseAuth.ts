@@ -40,7 +40,6 @@ export default function useFirebaseAuth() {
           create_conversation: process.env.REACT_APP_DISABLE_TWILIO_CONVERSATIONS !== 'true',
         }),
       }).then(res => {
-        console.log('RES: ', res);
         return res.json();
       });
     },
@@ -79,7 +78,6 @@ export default function useFirebaseAuth() {
   useEffect(() => {
     firebase.initializeApp(firebaseConfig);
     firebase.auth().onAuthStateChanged(newUser => {
-      console.log(newUser);
       setUser(newUser);
       getUserRole(newUser?.uid || '');
       setIsAuthReady(true);
@@ -103,7 +101,6 @@ export default function useFirebaseAuth() {
       .auth()
       .signInWithEmailAndPassword(email, password)
       .then(newUser => {
-        console.log(newUser);
         setUser(newUser.user);
         getUserRole(newUser?.user?.uid || '');
         console.log('User authenticated.');
@@ -120,28 +117,37 @@ export default function useFirebaseAuth() {
   }, []);
 
   // Firestore methods
-  const verifySessionId = useCallback(async (sessionId: string) => {
-    const docRef = firebase
-      .firestore()
-      .collection('videoSessions')
-      .doc(sessionId);
-    const doc = await docRef.get().catch(e => {
-      console.log(e);
-      return Promise.reject(false);
-    });
-    if (!doc.exists) {
-      return false;
-    } else {
-      console.log('Document data:', doc.data());
-      setSessionData(doc?.data() || null);
-      return true;
-    }
-  }, []);
+  const verifySessionId = useCallback(
+    async (sessionId: string) => {
+      if (user?.uid) {
+        const docRef = firebase.firestore().collection('videoSessions');
+
+        const snapshot = await docRef
+          .where('sessionId', '==', sessionId)
+          .where('traineeId', '==', user?.uid)
+          .get();
+        if (snapshot.empty) {
+          return false;
+        } else {
+          if (snapshot.size == 1) {
+            setSessionData(snapshot.docs[0]?.data() || null);
+            return true;
+          } else if (snapshot.size > 1) {
+            alert('Mutliple sessions found. Contact MammaCare Trainer.');
+            return false;
+          } else alert('Unable to join this session. Contact MammaCare Trainer.');
+          return false;
+        }
+      } else {
+        alert('User not yet authenticated.');
+        return false;
+      }
+    },
+    [user]
+  );
 
   const getUserRole = async (userId: string) => {
-    console.log('USER ID: ', userId);
     if (userId === '') {
-      console.log('userId is empty string');
       setIsAdmin(false);
       return;
     }
