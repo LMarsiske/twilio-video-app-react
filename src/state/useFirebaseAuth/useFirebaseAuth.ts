@@ -131,8 +131,8 @@ export default function useFirebaseAuth() {
           return false;
         } else {
           if (
-            (snapshot.size == 1 && snapshot.docs[0]?.data().hostId == user?.uid) ||
-            snapshot.docs[0]?.data().traineeId == user?.uid
+            snapshot.size == 1 &&
+            (snapshot.docs[0]?.data().hostId == user?.uid || snapshot.docs[0]?.data().traineeId == user?.uid)
           ) {
             setSessionData(snapshot.docs[0]?.data() || null);
             return true;
