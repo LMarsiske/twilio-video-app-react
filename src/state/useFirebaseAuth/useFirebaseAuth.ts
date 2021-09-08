@@ -5,6 +5,7 @@ import 'firebase/firebase-firestore';
 import 'firebase/storage';
 import Konva from 'konva';
 import { isNull } from 'util';
+import { AlternateEmail } from '@material-ui/icons';
 
 const firebaseConfig = {
   projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
@@ -104,6 +105,9 @@ export default function useFirebaseAuth() {
         setUser(newUser.user);
         getUserRole(newUser?.user?.uid || '');
         console.log('User authenticated.');
+      })
+      .catch(e => {
+        alert(e.message);
       });
   }, []);
 
