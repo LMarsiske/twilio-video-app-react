@@ -5,6 +5,7 @@ import 'firebase/firebase-firestore';
 import 'firebase/storage';
 import Konva from 'konva';
 import { isNull } from 'util';
+import { AlternateEmail } from '@material-ui/icons';
 
 const firebaseConfig = {
   projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
@@ -40,7 +41,6 @@ export default function useFirebaseAuth() {
           create_conversation: process.env.REACT_APP_DISABLE_TWILIO_CONVERSATIONS !== 'true',
         }),
       }).then(res => {
-        console.log('RES: ', res);
         return res.json();
       });
     },
@@ -79,7 +79,6 @@ export default function useFirebaseAuth() {
   useEffect(() => {
     firebase.initializeApp(firebaseConfig);
     firebase.auth().onAuthStateChanged(newUser => {
-      console.log(newUser);
       setUser(newUser);
       getUserRole(newUser?.uid || '');
       setIsAuthReady(true);
@@ -103,10 +102,12 @@ export default function useFirebaseAuth() {
       .auth()
       .signInWithEmailAndPassword(email, password)
       .then(newUser => {
-        console.log(newUser);
         setUser(newUser.user);
         getUserRole(newUser?.user?.uid || '');
         console.log('User authenticated.');
+      })
+      .catch(e => {
+        alert(e.message);
       });
   }, []);
 
@@ -120,28 +121,37 @@ export default function useFirebaseAuth() {
   }, []);
 
   // Firestore methods
-  const verifySessionId = useCallback(async (sessionId: string) => {
-    const docRef = firebase
-      .firestore()
-      .collection('videoSessions')
-      .doc(sessionId);
-    const doc = await docRef.get().catch(e => {
-      console.log(e);
-      return Promise.reject(false);
-    });
-    if (!doc.exists) {
-      return false;
-    } else {
-      console.log('Document data:', doc.data());
-      setSessionData(doc?.data() || null);
-      return true;
-    }
-  }, []);
+  const verifySessionId = useCallback(
+    async (sessionId: string) => {
+      if (user?.uid) {
+        const docRef = firebase.firestore().collection('videoSessions');
+
+        const snapshot = await docRef.where('sessionId', '==', sessionId).get();
+        if (snapshot.empty) {
+          return false;
+        } else {
+          if (
+            snapshot.size == 1 &&
+            (snapshot.docs[0]?.data().hostId == user?.uid || snapshot.docs[0]?.data().traineeId == user?.uid)
+          ) {
+            setSessionData(snapshot.docs[0]?.data() || null);
+            return true;
+          } else if (snapshot.size > 1) {
+            alert('Mutliple sessions found. Contact MammaCare Trainer.');
+            return false;
+          } else alert('Unable to join this session. Contact MammaCare Trainer.');
+          return false;
+        }
+      } else {
+        alert('User not yet authenticated.');
+        return false;
+      }
+    },
+    [user]
+  );
 
   const getUserRole = async (userId: string) => {
-    console.log('USER ID: ', userId);
     if (userId === '') {
-      console.log('userId is empty string');
       setIsAdmin(false);
       return;
     }
@@ -164,24 +174,41 @@ export default function useFirebaseAuth() {
 
   const saveVirtualGridOverlay = async (fileName: string, url: string) => {
     console.log('Saving virtual overlay: ', sessionData);
-    if (!sessionData) {
-      return;
-    }
+    let result: Promise<{ status: string; message: string }>;
+    result = new Promise((resolve, reject) => {
+      if (!sessionData) {
+        reject({ status: 'failed', message: 'Invalid session data' });
+      }
 
-    let fileRef = firebase
-      .storage()
-      .ref(
-        `profileDocs/${sessionData!.traineeId}/teletrainingDataGrids/${
-          sessionData!.traineeId
-        }_${fileName}_${Date.now()}.png`
-      );
-    let blob = convertURLToBlob(url);
-    if (blob) {
-      fileRef
-        .put(blob)
-        .then(() => console.log('uploaded a blob'))
-        .catch(e => console.log(e));
-    }
+      let fileRef = firebase
+        .storage()
+        .ref(
+          `profileDocs/${sessionData!.traineeId}/teletrainingDataGrids/${
+            sessionData!.traineeId
+          }_${fileName}_${Date.now()}.png`
+        );
+
+      const metadata = {
+        contentType: 'image/png',
+        createdBy: user?.uid || 'unavailable',
+      };
+
+      let blob = convertURLToBlob(url);
+      if (blob) {
+        fileRef
+          .put(blob, metadata)
+          .then(() => {
+            console.log('uploaded a blob');
+            reject({ status: 'failed', message: 'Testing rejection handling.' });
+            resolve({ status: 'success', message: 'File upload complete.' });
+          })
+          .catch(e => {
+            console.log(e);
+            reject({ status: 'failed', message: e.message });
+          });
+      }
+    });
+    return result;
   };
 
   const convertURLToBlob = (url: string | undefined) => {

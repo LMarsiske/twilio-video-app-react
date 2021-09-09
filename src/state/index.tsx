@@ -6,7 +6,6 @@ import useActiveSinkId from './useActiveSinkId/useActiveSinkId';
 import useFirebaseAuth from './useFirebaseAuth/useFirebaseAuth';
 import usePasscodeAuth from './usePasscodeAuth/usePasscodeAuth';
 import { User } from 'firebase';
-import Konva from 'konva';
 
 export interface StateContextType {
   error: TwilioError | Error | null;
@@ -26,7 +25,10 @@ export interface StateContextType {
   roomType?: RoomType;
   updateRecordingRules(room_sid: string, rules: RecordingRules): Promise<object>;
   isAdmin: boolean;
-  saveVirtualGridOverlay: (fileName: string, url: string) => Promise<void>;
+  saveVirtualGridOverlay: (
+    fileName: string,
+    url: string
+  ) => Promise<{ status: string; message: string }> | Promise<undefined>;
 }
 
 export const StateContext = createContext<StateContextType>(null!);
