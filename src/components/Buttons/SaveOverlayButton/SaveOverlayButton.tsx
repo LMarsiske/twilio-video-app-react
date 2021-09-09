@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function SaveOverlayButton(props: { disabled?: boolean }) {
   const classes = useStyles();
   const { saveImage, isSavingAllowed } = useOverlayContext();
-  const { saveVirtualGridOverlay, user } = useAppState();
+  const { user } = useAppState();
   const screenShareParticipant = useScreenShareParticipant();
   const [open, setOpen] = useState(false);
   const [overlay, setOverlay] = useState<{ group: Konva.Group; url: string } | null>(null);
@@ -52,7 +52,6 @@ export default function SaveOverlayButton(props: { disabled?: boolean }) {
     let overlay = saveImage();
     setOverlay(overlay);
     setOpen(true);
-    // saveVirtualGridOverlay(user?.displayName || 'test', 'test', group.url);
   };
 
   return (

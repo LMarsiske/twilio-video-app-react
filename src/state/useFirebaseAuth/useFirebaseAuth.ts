@@ -174,24 +174,41 @@ export default function useFirebaseAuth() {
 
   const saveVirtualGridOverlay = async (fileName: string, url: string) => {
     console.log('Saving virtual overlay: ', sessionData);
-    if (!sessionData) {
-      return;
-    }
+    let result: Promise<{ status: string; message: string }>;
+    result = new Promise((resolve, reject) => {
+      if (!sessionData) {
+        reject({ status: 'failed', message: 'Invalid session data' });
+      }
 
-    let fileRef = firebase
-      .storage()
-      .ref(
-        `profileDocs/${sessionData!.traineeId}/teletrainingDataGrids/${
-          sessionData!.traineeId
-        }_${fileName}_${Date.now()}.png`
-      );
-    let blob = convertURLToBlob(url);
-    if (blob) {
-      fileRef
-        .put(blob)
-        .then(() => console.log('uploaded a blob'))
-        .catch(e => console.log(e));
-    }
+      let fileRef = firebase
+        .storage()
+        .ref(
+          `profileDocs/${sessionData!.traineeId}/teletrainingDataGrids/${
+            sessionData!.traineeId
+          }_${fileName}_${Date.now()}.png`
+        );
+
+      const metadata = {
+        contentType: 'image/png',
+        createdBy: user?.uid || 'unavailable',
+      };
+
+      let blob = convertURLToBlob(url);
+      if (blob) {
+        fileRef
+          .put(blob, metadata)
+          .then(() => {
+            console.log('uploaded a blob');
+            reject({ status: 'failed', message: 'Testing rejection handling.' });
+            resolve({ status: 'success', message: 'File upload complete.' });
+          })
+          .catch(e => {
+            console.log(e);
+            reject({ status: 'failed', message: e.message });
+          });
+      }
+    });
+    return result;
   };
 
   const convertURLToBlob = (url: string | undefined) => {

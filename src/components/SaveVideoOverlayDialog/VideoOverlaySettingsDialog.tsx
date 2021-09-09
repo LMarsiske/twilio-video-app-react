@@ -101,6 +101,7 @@ export default function SaveVideoOverlayDialog({ open, onClose, overlay }: SaveV
 
   const [overlayImg, setOverlayImg] = useState<HTMLImageElement | null>(null);
   const [fileName, setFileName] = useState<string>('');
+  const [message, setMessage] = useState<string>('');
 
   useEffect(() => {
     console.log(open, onClose, overlay);
@@ -114,10 +115,21 @@ export default function SaveVideoOverlayDialog({ open, onClose, overlay }: SaveV
     }
   }, [overlay]);
 
-  const confirmSave = () => {
-    saveVirtualGridOverlay(fileName, overlay!.url);
-    onClose();
-    setFileName('');
+  const confirmSave = async () => {
+    try {
+      setMessage('Saving, please wait...');
+      const response = await saveVirtualGridOverlay(fileName, overlay!.url);
+      console.log('resposne: ', response);
+      if (response?.status == 'success') {
+        setMessage('');
+        onClose();
+        setFileName('');
+      } else {
+        setMessage(response?.message || 'Unable to save, undefined error...');
+      }
+    } catch (e) {
+      setMessage(e.message || 'Unable to save, undefined error...');
+    }
   };
 
   const onTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -154,6 +166,7 @@ export default function SaveVideoOverlayDialog({ open, onClose, overlay }: SaveV
             />
           </FormControl>
         </div>
+        {message ? <p>{message}</p> : null}
         {/* <div className={classes.listSection}>
           <Typography variant="h6" className={classes.headline}>
             Video
@@ -177,7 +190,10 @@ export default function SaveVideoOverlayDialog({ open, onClose, overlay }: SaveV
         <Button
           variant="contained"
           className={classes.button}
-          onClick={onClose}
+          onClick={() => {
+            setMessage('');
+            onClose();
+          }}
           style={{ backgroundColor: '#680000', color: 'white' }}
         >
           Cancel
