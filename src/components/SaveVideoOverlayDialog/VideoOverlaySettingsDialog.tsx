@@ -128,7 +128,13 @@ export default function SaveVideoOverlayDialog({ open, onClose, overlay }: SaveV
         setMessage(response?.message || 'Unable to save, undefined error...');
       }
     } catch (e) {
-      setMessage(e.message || 'Unable to save, undefined error...');
+      setMessage(e.message + ' <br /> Please save the local download.' || 'Unable to save, undefined error...');
+      // trigger local download
+      let hiddenElement = document.createElement('a');
+      hiddenElement.href = overlay!.url;
+      hiddenElement.target = '_blank';
+      hiddenElement.download = `${fileName}_${Date.now()}.png`;
+      hiddenElement.click();
     }
   };
 
