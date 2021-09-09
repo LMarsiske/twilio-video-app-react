@@ -92,9 +92,10 @@
     "cypress:open": "cypress open",
     "cypress:run": "cypress run --browser chrome",
     "cypress:ci": "cross-env CYPRESS_baseUrl=http://localhost:8081 start-server-and-test server http://localhost:8081 cypress:run",
-    "start-dev": "firebase use dev && set REACT_APP_STAGE=dev && react-scripts start",
+    "start-dev": "firebase use dev && set REACT_APP_STAGE=dev&& react-scripts start",
     "deploy-dev": "firebase use dev && set REACT_APP_STAGE=dev&& react-scripts build && firebase deploy --only hosting:dev",
-    "start-prod": "firebase use prod && set REACT_APP_STAGE=prod&& react-scripts start"
+    "start-prod": "firebase use prod && set REACT_APP_STAGE=prod&& react-scripts start",
+    "deploy-prod": "firebase use prod && set REACT_APP_STAGE=prod&& react-scripts build && firebase deploy --only hosting:prod"
   },
   "eslintConfig": {
     "extends": "react-app",
