@@ -1,5 +1,23 @@
 {
   "projects": {
-    "default": "mammacare-training-app-dev"
+    "default": "mammacare-training-app-dev",
+    "prod": "mamamcare-pad-firebase",
+    "dev": "mammacare-training-app-dev"
+  },
+  "targets": {
+    "mamamcare-pad-firebase": {
+      "hosting": {
+        "prod": [
+          "mamamcare-pad-firebase"
+        ]
+      }
+    },
+    "mammacare-training-app-dev": {
+      "hosting": {
+        "dev": [
+          "mammacare-training-app-dev"
+        ]
+      }
+    }
   }
 }
