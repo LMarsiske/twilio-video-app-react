@@ -53,7 +53,7 @@ const UserMenu: React.FC = () => {
       <div className={classes.userContainer}>
         <UserAvatar user={user} />
         <Button onClick={() => setMenuOpen(isOpen => !isOpen)} ref={anchorRef} className={classes.userButton}>
-          {user!.displayName}
+          {user!.email}
           <ExpandMoreIcon />
         </Button>
         <Menu

@@ -47,7 +47,7 @@ export default function RoomNameScreen({ name, roomName, setName, setRoomName, h
     setRoomName(event.target.value);
   };
 
-  const hasUsername = !window.location.search.includes('customIdentity=true') && user?.displayName;
+  const hasUsername = !window.location.search.includes('customIdentity=true') && user?.email;
 
   return (
     <>

@@ -9,13 +9,11 @@
   "hosting": [
     {
       "target": "dev",
-      "site": "twilio-video-demo-app",
       "public": "build",
       "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
     },
     {
       "target": "prod",
-      "site": "mammacare-twilio-web-app",
       "public": "build",
       "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
     }

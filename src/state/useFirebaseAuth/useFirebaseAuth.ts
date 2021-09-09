@@ -7,14 +7,26 @@ import Konva from 'konva';
 import { isNull } from 'util';
 import { AlternateEmail } from '@material-ui/icons';
 
-const firebaseConfig = {
-  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
-  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
-  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
-  databaseURL: process.env.REACT_APP_FIREBASE_DATABASE_URL,
-  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
-};
+const firebaseConfig =
+  process.env.REACT_APP_STAGE == 'prod'
+    ? {
+        apiKey: process.env.REACT_APP_PROD_API_KEY,
+        authDomain: process.env.REACT_APP_PROD_AUTH_DOMAIN,
+        databaseURL: process.env.REACT_APP_PROD_DATABASE_URL,
+        projectId: process.env.REACT_APP_PROD_PROJECT_ID,
+        storageBucket: process.env.REACT_APP_PROD_STORAGE_BUCKET,
+        messagingSenderId: process.env.REACT_APP_PROD_MESSAGING_SENDER_ID,
+        appId: process.env.REACT_APP_PROD_APP_ID,
+      }
+    : {
+        apiKey: process.env.REACT_APP_DEV_API_KEY,
+        authDomain: process.env.REACT_APP_DEV_AUTH_DOMAIN,
+        databaseURL: process.env.REACT_APP_DEV_DATABASE_URL,
+        projectId: process.env.REACT_APP_DEV_PROJECT_ID,
+        storageBucket: process.env.REACT_APP_DEV_STORAGE_BUCKET,
+        messagingSenderId: process.env.REACT_APP_DEV_MESSAGING_SENDER_ID,
+        appId: process.env.REACT_APP_DEV_APP_ID,
+      };
 
 export default function useFirebaseAuth() {
   const [user, setUser] = useState<firebase.User | null>(null);
@@ -30,7 +42,12 @@ export default function useFirebaseAuth() {
       headers.set('Authorization', idToken);
       headers.set('content-type', 'application/json');
 
-      const endpoint = process.env.REACT_APP_TOKEN_ENDPOINT || '/token';
+      let correctEndpoint =
+        process.env.REACT_APP_STAGE === 'prod'
+          ? process.env.REACT_APP_PROD_TOKEN_ENDPOINT
+          : process.env.REACT_APP_DEV_TOKEN_ENDPOINT;
+
+      const endpoint = correctEndpoint || '/token';
 
       return fetch(endpoint, {
         method: 'POST',
@@ -79,6 +96,7 @@ export default function useFirebaseAuth() {
   useEffect(() => {
     firebase.initializeApp(firebaseConfig);
     firebase.auth().onAuthStateChanged(newUser => {
+      console.log('NEWUSER: ', newUser);
       setUser(newUser);
       getUserRole(newUser?.uid || '');
       setIsAuthReady(true);
@@ -104,7 +122,7 @@ export default function useFirebaseAuth() {
       .then(newUser => {
         setUser(newUser.user);
         getUserRole(newUser?.user?.uid || '');
-        console.log('User authenticated.');
+        console.log('User authenticated: ', newUser.user);
       })
       .catch(e => {
         alert(e.message);
@@ -132,6 +150,7 @@ export default function useFirebaseAuth() {
         } else {
           if (
             snapshot.size == 1 &&
+            !snapshot.docs[0]?.data().disabled &&
             (snapshot.docs[0]?.data().hostId == user?.uid || snapshot.docs[0]?.data().traineeId == user?.uid)
           ) {
             setSessionData(snapshot.docs[0]?.data() || null);

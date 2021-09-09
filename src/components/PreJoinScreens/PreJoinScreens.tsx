@@ -19,7 +19,7 @@ export default function PreJoinScreens() {
   const { URLRoomName } = useParams();
   const [step, setStep] = useState(Steps.roomNameStep);
 
-  const [name, setName] = useState<string>(user?.displayName || '');
+  const [name, setName] = useState<string>(user?.email || '');
   const [roomName, setRoomName] = useState<string>('');
 
   const [mediaError, setMediaError] = useState<Error>();
@@ -27,7 +27,7 @@ export default function PreJoinScreens() {
   useEffect(() => {
     if (URLRoomName) {
       setRoomName(URLRoomName);
-      if (user?.displayName) {
+      if (user?.email) {
         setStep(Steps.deviceSelectionStep);
       }
     }

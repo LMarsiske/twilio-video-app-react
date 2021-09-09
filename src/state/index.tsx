@@ -11,7 +11,7 @@ export interface StateContextType {
   error: TwilioError | Error | null;
   setError(error: TwilioError | Error | null): void;
   getToken(name: string, room: string, passcode?: string): Promise<{ room_type: RoomType; token: string }>;
-  user?: User | null | { displayName: undefined; photoURL: undefined; passcode?: string };
+  user?: User | null | { displayName: undefined; photoURL: undefined; passcode?: string; email: undefined };
   signIn?(passcode?: string): Promise<void>;
   firebaseSignIn(email: string, password: string): Promise<void>;
   signOut?(): Promise<void>;
@@ -74,7 +74,11 @@ export default function AppStateProvider(props: React.PropsWithChildren<{}>) {
     contextValue = {
       ...contextValue,
       getToken: async (user_identity, room_name) => {
-        const endpoint = process.env.REACT_APP_TOKEN_ENDPOINT || '/token';
+        let correctEndpoint =
+          process.env.REACT_APP_STAGE === 'prod'
+            ? process.env.REACT_APP_PROD_TOKEN_ENDPOINT
+            : process.env.REACT_APP_DEV_TOKEN_ENDPOINT;
+        const endpoint = correctEndpoint || '/token';
 
         return fetch(endpoint, {
           method: 'POST',
@@ -92,7 +96,11 @@ export default function AppStateProvider(props: React.PropsWithChildren<{}>) {
         });
       },
       updateRecordingRules: async (room_sid, rules) => {
-        const endpoint = process.env.REACT_APP_TOKEN_ENDPOINT || '/recordingrules';
+        let correctEndpoint =
+          process.env.REACT_APP_STAGE === 'prod'
+            ? process.env.REACT_APP_PROD_TOKEN_ENDPOINT
+            : process.env.REACT_APP_DEV_TOKEN_ENDPOINT;
+        const endpoint = correctEndpoint || '/recordingrules';
 
         return fetch(endpoint, {
           headers: {

@@ -1,7 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
-const endpoint = process.env.REACT_APP_TOKEN_ENDPOINT || '/token';
+let correctEndpoint =
+  process.env.REACT_APP_STAGE === 'prod'
+    ? process.env.REACT_APP_PROD_TOKEN_ENDPOINT
+    : process.env.REACT_APP_DEV_TOKEN_ENDPOINT;
+const endpoint = correctEndpoint || '/token';
 
 export function getPasscode() {
   const match = window.location.search.match(/passcode=(.*)&?/);
@@ -60,7 +64,12 @@ export function getErrorMessage(message: string) {
 export default function usePasscodeAuth() {
   const history = useHistory();
 
-  const [user, setUser] = useState<{ displayName: undefined; photoURL: undefined; passcode: string } | null>(null);
+  const [user, setUser] = useState<{
+    displayName: undefined;
+    photoURL: undefined;
+    passcode: string;
+    email: undefined;
+  } | null>(null);
   const [isAuthReady, setIsAuthReady] = useState(false);
 
   const getToken = useCallback(

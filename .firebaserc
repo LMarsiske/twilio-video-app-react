@@ -8,14 +8,14 @@
     "mamamcare-pad-firebase": {
       "hosting": {
         "prod": [
-          "mamamcare-pad-firebase"
+          "mammacare-twilio-web-app"
         ]
       }
     },
     "mammacare-training-app-dev": {
       "hosting": {
         "dev": [
-          "mammacare-training-app-dev"
+          "twilio-video-demo-app"
         ]
       }
     }

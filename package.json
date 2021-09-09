@@ -92,7 +92,9 @@
     "cypress:open": "cypress open",
     "cypress:run": "cypress run --browser chrome",
     "cypress:ci": "cross-env CYPRESS_baseUrl=http://localhost:8081 start-server-and-test server http://localhost:8081 cypress:run",
-    "deploy-dev": "react-scripts build && firebase deploy --only hosting:twilio-video-demo-app "
+    "start-dev": "firebase use dev && set REACT_APP_STAGE=dev && react-scripts start",
+    "deploy-dev": "firebase use dev && set REACT_APP_STAGE=dev&& react-scripts build && firebase deploy --only hosting:dev",
+    "start-prod": "firebase use prod && set REACT_APP_STAGE=prod&& react-scripts start"
   },
   "eslintConfig": {
     "extends": "react-app",
