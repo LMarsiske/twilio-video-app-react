@@ -39,7 +39,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     screenShareBanner: {
       position: 'fixed',
-      zIndex: 8,
+      zIndex: 9999,
       bottom: `${theme.footerHeight}px`,
       left: 0,
       right: 0,
@@ -92,12 +92,12 @@ export default function MenuBar() {
             <Grid style={{ flex: 1 }}>
               <ToggleAudioButton disabled={isReconnecting} />
               <ToggleVideoButton disabled={isReconnecting} />
+              <Menu />
             </Grid>
           </Hidden>
           {isAdmin ? (
             <Grid item>
               <Grid container justifyContent="center">
-                <Menu />
                 <ToggleOverlayModeButton />
                 <SaveOverlayButton />
                 <ClearOverlayButton />

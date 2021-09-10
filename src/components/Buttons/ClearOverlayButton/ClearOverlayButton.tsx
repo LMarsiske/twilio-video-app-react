@@ -1,19 +1,8 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 
-import {
-  Button,
-  Tooltip,
-  Menu,
-  MenuItem,
-  IconButton,
-  ListItemIcon,
-  ListItemText,
-  FormControl,
-  FormControlLabel,
-  Checkbox,
-} from '@material-ui/core';
-import { Clear, Undo } from '@material-ui/icons';
+import { Button, Tooltip, Menu, MenuItem, IconButton, ListItemIcon, ListItemText } from '@material-ui/core';
+import { Clear, Undo, Replay } from '@material-ui/icons';
 
 import CustomHoverMenu from '../../CustomHoverMenu/CustomHoverMenu';
 
@@ -44,6 +33,7 @@ export default function ClearUndoOverlayButton(props: { disabled?: boolean }) {
     canUndoLastLine,
     toggleShouldClearOverlayState,
     toggleShouldUndoLastLine,
+    resetOverlay,
   } = useOverlayContext();
 
   const isDisabled = false;
@@ -85,12 +75,20 @@ export default function ClearUndoOverlayButton(props: { disabled?: boolean }) {
         //   </MenuItem>
         // ))}
         children={
-          <MenuItem onClick={() => toggleShouldClearOverlayState(true)}>
-            <ListItemIcon style={{ minWidth: 0 }}>
-              <Clear />
-            </ListItemIcon>
-            <ListItemText>Clear All Marks</ListItemText>
-          </MenuItem>
+          <>
+            <MenuItem onClick={resetOverlay}>
+              <ListItemIcon style={{ minWidth: 0 }}>
+                <Replay />
+              </ListItemIcon>
+              <ListItemText>Reset Overlay</ListItemText>
+            </MenuItem>
+            <MenuItem onClick={() => toggleShouldClearOverlayState(true)}>
+              <ListItemIcon style={{ minWidth: 0 }}>
+                <Clear />
+              </ListItemIcon>
+              <ListItemText>Clear All Marks</ListItemText>
+            </MenuItem>
+          </>
         }
         disabled={!isResetAllowed}
       />

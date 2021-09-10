@@ -42,6 +42,7 @@ export interface IOverlayContext {
   setStrokeColor: (color: string) => void;
   markerColor: string;
   setMarkerColor: (color: string) => void;
+  resetOverlay: () => void;
 }
 
 export const OverlayContext = createContext<IOverlayContext>(null!);
@@ -100,6 +101,11 @@ export function OverlayProvider({ children }: OverlayProviderProps) {
         setStrokeColor,
         markerColor,
         setMarkerColor,
+        resetOverlay: () => {
+          resetVideoOverlay();
+          setIsOverlayDrawable(false);
+          setIsResetAllowed(false);
+        },
       }}
     >
       {children}

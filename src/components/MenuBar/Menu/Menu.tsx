@@ -1,7 +1,8 @@
 import React, { useState, useRef } from 'react';
 import VideoOverlaySettingsDialog from '../../VideoOverlaySettingsDialog/VideoOverlaySettingsDialog';
 import DeviceSelectionDialog from '../../DeviceSelectionDialog/DeviceSelectionDialog';
-import { ExpandMore, MoreVert, Settings, SettingsOverscan } from '@material-ui/icons';
+import ToggleScreenShareButton from '../../Buttons/ToogleScreenShareButton/ToggleScreenShareButton';
+import { ExpandMore, MoreVert, Settings, SettingsOverscan, ScreenShare } from '@material-ui/icons';
 import { Button, styled, Theme, useMediaQuery, Menu as MenuContainer, MenuItem, Typography } from '@material-ui/core';
 
 import { useAppState } from '../../../state';
@@ -9,6 +10,7 @@ import useChatContext from '../../../hooks/useChatContext/useChatContext';
 import useIsRecording from '../../../hooks/useIsRecording/useIsRecording';
 import useVideoContext from '../../../hooks/useVideoContext/useVideoContext';
 import useFlipCameraToggle from '../../../hooks/useFlipCameraToggle/useFlipCameraToggle';
+import useScreenShareParticipant from '../../../hooks/useScreenShareParticipant/useScreenShareParticipant';
 
 export const IconContainer = styled('div')({
   display: 'flex',
@@ -27,7 +29,9 @@ export default function Menu(props: { buttonClassName?: string }) {
   const { isFetching, updateRecordingRules, roomType } = useAppState();
   const { setIsChatWindowOpen } = useChatContext();
   const isRecording = useIsRecording();
-  const { room, setIsBackgroundSelectionOpen } = useVideoContext();
+  const { room, setIsBackgroundSelectionOpen, toggleScreenShare } = useVideoContext();
+  const { isAdmin } = useAppState();
+  const screenShareParticipant = useScreenShareParticipant();
 
   const anchorRef = useRef<HTMLButtonElement>(null);
   const { flipCameraDisabled, toggleFacingMode, flipCameraSupported } = useFlipCameraToggle();
@@ -100,6 +104,20 @@ export default function Menu(props: { buttonClassName?: string }) {
           </IconContainer>
           <Typography variant="body1">Audio and Video Settings</Typography>
         </MenuItem>
+        <MenuItem
+          onClick={() => {
+            setMenuOpen(false);
+            toggleScreenShare();
+          }}
+          disabled={
+            Boolean(screenShareParticipant) || !(navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia)
+          }
+        >
+          <IconContainer>
+            <ScreenShare />
+          </IconContainer>
+          <Typography variant="body1">Share Screen</Typography>
+        </MenuItem>
 
         {/* {isSupported && (
           <MenuItem
@@ -116,7 +134,7 @@ export default function Menu(props: { buttonClassName?: string }) {
           </MenuItem>
         )} */}
 
-        <MenuItem
+        {/* <MenuItem
           onClick={() => {
             setMenuOpen(false);
             setOverlaySettingsOpen(true);
@@ -126,7 +144,7 @@ export default function Menu(props: { buttonClassName?: string }) {
             <SettingsOverscan />
           </IconContainer>
           <Typography variant="body1">Video Overlay Settings</Typography>
-        </MenuItem>
+        </MenuItem> */}
       </MenuContainer>
       <VideoOverlaySettingsDialog
         open={overlaySettingsOpen}
