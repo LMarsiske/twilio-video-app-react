@@ -45,7 +45,7 @@ interface CustomHoverMenuProps {
 
 export default function CustomHoverMenu({ disabled = false, tightFit = true, children }: CustomHoverMenuProps) {
   const classes = useStyles();
-  const { resetVideoOverlay, isResetAllowed, toggleShouldClearOverlayState, markers, setMarkers } = useOverlayContext();
+  const { isResetAllowed, setMarkers } = useOverlayContext();
   const isDisabled = false;
   let tooltipMessage = '';
   if (!isResetAllowed) {

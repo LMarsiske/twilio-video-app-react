@@ -98,6 +98,7 @@ export default function SaveVideoOverlayDialog({ open, onClose, overlay }: SaveV
   const theme = useTheme();
   let isStacked = useMediaQuery(theme.breakpoints.down('sm'));
   const { saveVirtualGridOverlay } = useAppState();
+  const { setIsResetAllowed } = useOverlayContext();
 
   const [overlayImg, setOverlayImg] = useState<HTMLImageElement | null>(null);
   const [fileName, setFileName] = useState<string>('');
@@ -135,6 +136,11 @@ export default function SaveVideoOverlayDialog({ open, onClose, overlay }: SaveV
       hiddenElement.target = '_blank';
       hiddenElement.download = `${fileName}_${Date.now()}.png`;
       hiddenElement.click();
+      onClose();
+      setMessage('');
+      setFileName('');
+    } finally {
+      setIsResetAllowed(true);
     }
   };
 

@@ -17,7 +17,7 @@ import { Color } from 'react-color';
 export interface IOverlayContext {
   isOverlayEnabled: boolean;
   toggleVideoOverlay: () => void;
-  resetVideoOverlay: () => void;
+  setIsResetAllowed: (state: boolean) => void;
   isOverlayDrawable: boolean;
   toggleOverlayDrawable: () => void;
   overlayElements: { grid: Konva.Shape | null; lines: { tool: string; points: number[] }[] | null } | null;
@@ -79,11 +79,7 @@ export function OverlayProvider({ children }: OverlayProviderProps) {
       value={{
         isOverlayEnabled,
         toggleVideoOverlay,
-        resetVideoOverlay: () => {
-          resetVideoOverlay();
-          setIsOverlayDrawable(false);
-          setIsResetAllowed(false);
-        },
+        setIsResetAllowed: state => setIsResetAllowed(state),
         isOverlayDrawable,
         toggleOverlayDrawable,
         overlayElements,

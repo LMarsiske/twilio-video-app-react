@@ -72,7 +72,7 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function MenuBar() {
   const classes = useStyles();
   const { isSharingScreen, toggleScreenShare } = useVideoContext();
-  const { isSavingAllowed, isResetAllowed, saveImage, resetVideoOverlay } = useOverlayContext();
+
   const roomState = useRoomState();
   const isReconnecting = roomState === 'reconnecting';
   const { room } = useVideoContext();
