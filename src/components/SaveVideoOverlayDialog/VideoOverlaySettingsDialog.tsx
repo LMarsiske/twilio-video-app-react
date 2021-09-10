@@ -120,15 +120,17 @@ export default function SaveVideoOverlayDialog({ open, onClose, overlay }: SaveV
     try {
       setMessage('Saving, please wait...');
       const response = await saveVirtualGridOverlay(fileName, overlay!.url);
-      console.log('resposne: ', response);
+      console.log('response: ', response);
       if (response?.status == 'success') {
         setMessage('');
         onClose();
         setFileName('');
       } else {
+        console.log('129 Failed to save file: ', response);
         setMessage(response?.message || 'Unable to save, undefined error...');
       }
     } catch (e) {
+      console.log('Failed to save file: ', e);
       setMessage(e.message + ' <br /> Please save the local download.' || 'Unable to save, undefined error...');
       // trigger local download
       let hiddenElement = document.createElement('a');
@@ -136,9 +138,9 @@ export default function SaveVideoOverlayDialog({ open, onClose, overlay }: SaveV
       hiddenElement.target = '_blank';
       hiddenElement.download = `${fileName}_${Date.now()}.png`;
       hiddenElement.click();
-      onClose();
-      setMessage('');
-      setFileName('');
+      // onClose();
+      // setMessage('');
+      // setFileName('');
     } finally {
       setIsResetAllowed(true);
     }
