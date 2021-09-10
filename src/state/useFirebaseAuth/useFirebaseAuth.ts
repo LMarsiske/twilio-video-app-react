@@ -218,7 +218,6 @@ export default function useFirebaseAuth() {
           .put(blob, metadata)
           .then(() => {
             console.log('uploaded a blob');
-            reject({ status: 'failed', message: 'Testing rejection handling.' });
             resolve({ status: 'success', message: 'File upload complete.' });
           })
           .catch(e => {
