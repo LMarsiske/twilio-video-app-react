@@ -145,7 +145,7 @@ export default function LoginPage() {
             Join Teletraining Session
           </Typography>
           <Typography variant="body1">
-            'Enter your authorized email and the session code provided by the instructor.
+            Enter your authorized email and the session code provided by the instructor.
           </Typography>
           <form onSubmit={handleSubmit}>
             <div className={classes.inputContainer}>
@@ -169,6 +169,7 @@ export default function LoginPage() {
                   Password
                 </InputLabel>
                 <TextField
+                  type="password"
                   autoCapitalize="false"
                   id="input-password"
                   variant="outlined"
