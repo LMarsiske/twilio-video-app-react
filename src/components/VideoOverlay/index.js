@@ -93,6 +93,14 @@ const VideoOverlay = props => {
   const [getRef, setRef] = useDynamicRefs();
 
   useEffect(() => {
+    if (stageRef.current) {
+      stageRef.current.on('pointerdown', e => {
+        console.log('Event type: ', e.pointerType);
+      });
+    }
+  }, [props]);
+
+  useEffect(() => {
     if (!isOverlayDrawable) {
       let currents = lineRefs.current.map(el => el.current);
       const nodes = [gridRef.current, squareRef.current, ...currents];
@@ -148,6 +156,7 @@ const VideoOverlay = props => {
   }, [shouldUndoLastLine]);
 
   const handleMouseDown = e => {
+    console.log('mouse down');
     const pos = e.target.getStage().getPointerPosition();
 
     const bound = {
@@ -203,6 +212,9 @@ const VideoOverlay = props => {
         onMouseDown={handleMouseDown}
         onMousemove={handleMouseMove}
         onMouseup={handleMouseUp}
+        onTouchStart={handleMouseDown}
+        onTouchMove={handleMouseMove}
+        onTouchEnd={handleMouseUp}
       >
         <Layer ref={layerRef}>
           <Group draggable={!isOverlayDrawable} ref={groupRef} width={500} height={500} x={10} y={10} onDragEnd={null}>

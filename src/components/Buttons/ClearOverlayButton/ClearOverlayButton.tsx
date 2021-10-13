@@ -74,22 +74,20 @@ export default function ClearUndoOverlayButton(props: { disabled?: boolean }) {
         //     />
         //   </MenuItem>
         // ))}
-        children={
-          <>
-            <MenuItem onClick={resetOverlay}>
-              <ListItemIcon style={{ minWidth: 0 }}>
-                <Replay />
-              </ListItemIcon>
-              <ListItemText>Reset Overlay</ListItemText>
-            </MenuItem>
-            <MenuItem onClick={() => toggleShouldClearOverlayState(true)}>
-              <ListItemIcon style={{ minWidth: 0 }}>
-                <Clear />
-              </ListItemIcon>
-              <ListItemText>Clear All Marks</ListItemText>
-            </MenuItem>
-          </>
-        }
+        children={[
+          <MenuItem onClick={resetOverlay}>
+            <ListItemIcon style={{ minWidth: 0 }}>
+              <Replay />
+            </ListItemIcon>
+            <ListItemText>Reset Overlay</ListItemText>
+          </MenuItem>,
+          <MenuItem onClick={() => toggleShouldClearOverlayState(true)}>
+            <ListItemIcon style={{ minWidth: 0 }}>
+              <Clear />
+            </ListItemIcon>
+            <ListItemText>Clear All Marks</ListItemText>
+          </MenuItem>,
+        ]}
         disabled={!isResetAllowed}
       />
     </>
