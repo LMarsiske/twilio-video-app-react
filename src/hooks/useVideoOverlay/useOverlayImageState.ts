@@ -103,6 +103,7 @@ export default function useOverlayImageState() {
 
     let pos = grid?.absolutePosition();
     console.log(pos);
+    console.log(grid);
     if (grid?.attrs.rotation && grid?.attrs.rotation !== 0) {
       let xy = translateAndRotatePoints(
         [grid.absolutePosition().x, grid.absolutePosition().y],
@@ -134,26 +135,29 @@ export default function useOverlayImageState() {
           scaleX: Number.isNaN(marker.attrs.scaleX / grid?.attrs.scaleX) ? 1 : marker.attrs.scaleX / grid?.attrs.scaleX,
           scaleY: Number.isNaN(marker.attrs.scaleY / grid?.attrs.scaleY) ? 1 : marker.attrs.scaleY / grid?.attrs.scaleY,
         };
+
         let newRotation = Number.isNaN(0 - offset.rotation + marker.attrs.rotation)
           ? 0
           : 0 - offset.rotation + marker.attrs.rotation;
-        let coords = translateAndRotatePoints(
+        console.log(newScale, newRotation);
+        let coords = translateLandmarks(
           [marker.getAbsolutePosition().x, marker.getAbsolutePosition().y],
-          {
-            ...offset,
-            ...newScale,
-          },
-          0 - offset.rotation
+          offset,
+          { ...newScale, newRotation, markerScaleX: marker.attrs.scaleX, markerScaleY: marker.attrs.scaleY },
+          newRotation
         );
+        console.log('COORDS: ', coords);
         group.add(
           new Konva.Text({
             text: marker.text(),
             x: coords[0],
             y: coords[1],
-            fontSize: 32,
+            fontSize: 30,
+            height: 40,
+            width: 40,
             stroke: 'black',
             fill: 'black',
-            rotation: newRotation,
+            //rotation: newRotation,
           })
         );
       });
@@ -221,6 +225,53 @@ export default function useOverlayImageState() {
     console.log(chunked, translated);
 
     return translated.flat();
+  };
+
+  const translateLandmarks = (
+    points: number[],
+    offset: { x: number; y: number; rotation: number; scaleX: number; scaleY: number },
+    relativeScale: { scaleX: number; scaleY: number; newRotation: number; markerScaleX: number; markerScaleY: number },
+    angle: number
+  ) => {
+    console.log(relativeScale);
+    let cx = (500 * offset.scaleX) / 2;
+    let cy = (500 * offset.scaleY) / 2;
+    let radians = (Math.PI / 180) * angle;
+    let cos = Math.cos(radians);
+    let sin = Math.sin(radians);
+    let markerCx = (40 * relativeScale.markerScaleX) / 2;
+    let markerCy = (40 * relativeScale.markerScaleY) / 2;
+    let markerRadians = (Math.PI / 180) * relativeScale.newRotation;
+    let markerCos = Math.cos(markerRadians);
+    let markerSin = Math.sin(markerRadians);
+    //console.log('Translating landmark: ', angle, offset);
+
+    let chunked = [];
+    for (let i = 0; i < points.length; i += 2) {
+      chunked.push(points.slice(i, i + 2));
+    }
+
+    let translated = chunked.map(chunk => {
+      let x = chunk[0];
+      let y = chunk[1];
+
+      let nx = cos * (x - cx) - sin * (y - cy) + cx;
+      let ny = cos * (y - cy) + sin * (x - cx) + cy;
+
+      let offsetNx = (nx - offset.x) * relativeScale.scaleX;
+      let offsetNy = (ny - offset.y) * relativeScale.scaleY;
+
+      let finalNx = markerCos * (offsetNx - markerCx) - markerSin * (offsetNy - markerCy) + markerCx;
+      let finalNy = markerCos * (offsetNy - markerCy) - markerSin * (offsetNx - markerCx) + markerCy;
+
+      return [offsetNx, offsetNy];
+    });
+
+    console.log(chunked, translated);
+
+    return translated.flat();
+
+    //return [(points[0] - offset.x) * offset.scaleX, (points[1] - offset.y) * offset.scaleY];
   };
 
   return [

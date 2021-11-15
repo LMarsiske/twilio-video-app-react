@@ -384,9 +384,10 @@ const N = forwardRef((props, ref) => {
 
   useEffect(() => {
     if (draggable) {
-      console.log('N can be dragged');
+      console.log('N can be dragged: ', ref.current.attrs);
       trRef.current.nodes([ref.current]);
       trRef.current.getLayer().batchDraw();
+      console.log(trRef.current.attrs);
     }
   }, [draggable]);
   return (
@@ -395,7 +396,9 @@ const N = forwardRef((props, ref) => {
         ref={ref}
         draggable={draggable}
         text="N"
-        fontSize={32}
+        fontSize={30}
+        height={40}
+        width={40}
         fontStyle="bold"
         x={x}
         y={y}
@@ -403,6 +406,7 @@ const N = forwardRef((props, ref) => {
         fill={color}
         align="center"
         verticalAlign="middle"
+        onTransformEnd={() => console.log(ref.current.absolutePosition(), ref.current.attrs.rotation)}
       />
       {draggable && (
         <Transformer
@@ -426,7 +430,7 @@ const V = forwardRef((props, ref) => {
 
   useEffect(() => {
     if (draggable) {
-      console.log('N can be dragged');
+      console.log('V can be dragged');
       trRef.current.nodes([ref.current]);
       trRef.current.getLayer().batchDraw();
     }
@@ -437,7 +441,9 @@ const V = forwardRef((props, ref) => {
         ref={ref}
         draggable={draggable}
         text="V"
-        fontSize={32}
+        fontSize={30}
+        height={40}
+        width={40}
         fontStyle="bold"
         x={x}
         y={y}
@@ -467,7 +473,7 @@ const A = forwardRef((props, ref) => {
 
   useEffect(() => {
     if (draggable) {
-      console.log('N can be dragged');
+      console.log('A can be dragged');
       trRef.current.nodes([ref.current]);
       trRef.current.getLayer().batchDraw();
     }
@@ -478,7 +484,9 @@ const A = forwardRef((props, ref) => {
         ref={ref}
         draggable={draggable}
         text="A"
-        fontSize={32}
+        fontSize={30}
+        height={40}
+        width={40}
         fontStyle="bold"
         x={x}
         y={y}
@@ -509,7 +517,7 @@ const S = forwardRef((props, ref) => {
 
   useEffect(() => {
     if (draggable) {
-      console.log('N can be dragged');
+      console.log('S can be dragged');
       trRef.current.nodes([ref.current]);
       trRef.current.getLayer().batchDraw();
     }
@@ -520,7 +528,9 @@ const S = forwardRef((props, ref) => {
         ref={ref}
         draggable={draggable}
         text="S"
-        fontSize={32}
+        fontSize={30}
+        height={40}
+        width={40}
         fontStyle="bold"
         x={x}
         y={y}
