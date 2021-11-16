@@ -157,7 +157,7 @@ export default function useOverlayImageState() {
             width: 40,
             stroke: 'black',
             fill: 'black',
-            //rotation: newRotation,
+            rotation: newRotation,
           })
         );
       });
